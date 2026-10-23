@@ -1,0 +1,1164 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#185C50">
+<meta name="description" content="Serumpun: connect greenhouse communities, trade plants, learn from neighbours and organise events.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Serumpun">
+<style>[hidden]{display:none!important}img{max-width:100%}</style>
+<title>Serumpun Prototype</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700;6..12,800&display=swap">
+<style>
+/* Layout: a lime "studio" page holding the resident app in a phone frame beside a demo guide; the SDP dashboard is a full-width web view. Single light look taken from the team's UI reference. */
+:root{
+  --ink:#134B5C; --ink-2:#3E6670; --ink-3:#5F7F86;
+  --teal:#185C50; --teal-deep:#12524F; --forest:#1E6B3D;
+  --lime:#C9DD63; --lime-2:#9DC53E; --lime-pale:#E3EC8E; --lime-wash:#F2F7D6;
+  --page:#E6ED8F; --card:#FFFFFF; --surface:#F7FAF9; --line:#E1E9DC;
+  --good:#2C8A4B; --warn:#B87F00; --bad:#C8463B;
+  --grad-primary:linear-gradient(90deg,#13525E 0%,#1E6B3D 100%);
+  --grad-lime:linear-gradient(90deg,#E6ED93 0%,#9DC53E 100%);
+  --shadow:0 6px 18px rgba(19,75,92,.08);
+  --font:"Nunito Sans","Segoe UI",system-ui,-apple-system,sans-serif;
+  color-scheme:light;
+}
+html,body{height:100%}
+body{background:var(--page);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.45;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0}
+*{box-sizing:border-box}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid #13525E;outline-offset:2px}
+h1,h2,h3{text-wrap:balance;margin:0}
+p{margin:0}
+.ic{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ---------- top bar ---------- */
+.topbar{max-width:1240px;margin:0 auto;display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding-block:14px}
+.brand{display:flex;align-items:center;gap:10px;margin-right:auto}
+.brand img.m{height:40px;width:auto}
+.brand img.w{height:20px;width:auto}
+.brand span{font-size:13px;color:var(--ink-2);font-weight:700;border-left:1.5px solid rgba(19,75,92,.25);padding-left:10px}
+.switch{display:flex;background:#fff;border-radius:999px;padding:4px;box-shadow:var(--shadow)}
+.switch button{border:0;background:transparent;border-radius:999px;padding:9px 16px;font-weight:700;color:var(--ink-2);display:flex;align-items:center;gap:8px;min-height:40px}
+.switch button[aria-pressed="true"]{background:var(--grad-primary);color:#fff}
+.switch .ic{width:18px;height:18px}
+.reset{border:1.5px solid rgba(19,75,92,.35);background:transparent;border-radius:999px;padding:8px 14px;font-weight:700;color:var(--ink);display:flex;gap:6px;align-items:center;min-height:40px}
+.reset .ic{width:17px;height:17px}
+
+/* ---------- stage ---------- */
+.stage{max-width:1240px;margin:0 auto;display:flex;gap:40px;justify-content:center;align-items:flex-start;flex-wrap:wrap;padding-block:6px 40px}
+.phone{width:390px;max-width:100%;height:min(812px,calc(100dvh - 92px));min-height:600px;background:var(--surface);border-radius:38px;box-shadow:0 30px 60px rgba(19,75,92,.20),0 0 0 1px rgba(19,75,92,.06);overflow:hidden;position:relative;flex:none}
+#screenRoot{position:absolute;inset:0;display:flex;flex-direction:column}
+.screen{position:relative;display:flex;flex-direction:column;height:100%;min-height:0}
+.scroll{flex:1;overflow-y:auto;overflow-x:hidden;min-height:0;padding-bottom:104px;scrollbar-width:thin}
+.scroll.noNav{padding-bottom:28px}
+
+/* guide */
+.guide{width:340px;max-width:100%;display:flex;flex-direction:column;gap:16px}
+.gcard{background:rgba(255,255,255,.75);border-radius:22px;padding:20px;box-shadow:var(--shadow)}
+.gcard h2{font-size:18px;font-weight:800;margin-bottom:6px}
+.gcard p{color:var(--ink-2);font-size:14px}
+.jump{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.jump button{border:0;background:var(--lime-pale);border-radius:999px;padding:7px 12px;font-weight:700;font-size:13px;color:var(--ink);min-height:36px}
+.jump button[aria-current="true"]{background:var(--grad-primary);color:#fff}
+.steps{margin:10px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--ink-2)}
+.steps b{color:var(--ink)}
+.livecount{display:flex;align-items:center;gap:10px;margin-top:12px;font-size:14px;font-weight:700}
+.livecount .n{background:var(--grad-primary);color:#fff;border-radius:12px;padding:4px 10px;font-variant-numeric:tabular-nums}
+
+/* ---------- shared app pieces ---------- */
+.card{background:var(--card);border-radius:20px;box-shadow:var(--shadow)}
+.btn{border:0;border-radius:999px;padding:12px 22px;font-weight:800;font-size:16px;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;text-decoration:none}
+.btn.primary{background:var(--grad-primary);color:#fff}
+.btn.lime{background:var(--grad-lime);color:var(--ink)}
+.btn.outline{background:transparent;border:1.6px solid var(--ink);color:var(--ink)}
+.btn.block{width:100%}
+.btn.sm{padding:7px 16px;font-size:14px;min-height:36px}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.btn .ic{width:19px;height:19px}
+.link{border:0;background:none;padding:0;font-weight:800;color:var(--forest);text-decoration:underline;text-underline-offset:3px;min-height:auto}
+.pill-in{width:100%;border:1.6px solid #A9CB4F;border-radius:999px;padding:12px 18px;background:#fff;min-height:48px}
+.pill-in::placeholder{color:#7F9A9F}
+textarea.pill-in{border-radius:20px;resize:vertical;min-height:110px}
+select.pill-in{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--ink) 50%),linear-gradient(135deg,var(--ink) 50%,transparent 50%);background-position:calc(100% - 22px) 52%,calc(100% - 16px) 52%;background-size:6px 6px;background-repeat:no-repeat}
+.fld{display:flex;flex-direction:column;gap:6px}
+.fld label,.lab{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2)}
+.err{color:var(--bad);font-size:13px;font-weight:700;min-height:18px}
+
+/* header band used on inner screens */
+.bar{position:relative;overflow:hidden;padding:18px 18px 16px;background:linear-gradient(180deg,#D3E472 0%,#A9CC45 100%);flex:none}
+.bar::before{content:"";position:absolute;width:380px;height:380px;border-radius:50%;background:linear-gradient(160deg,#1C6150,#15574F);left:-140px;top:-262px}
+.bar::after{content:"";position:absolute;width:220px;height:220px;border-radius:50%;background:#D7E77E;right:-90px;top:-120px}
+.bar>*{position:relative;z-index:1}
+.bar-row{display:flex;align-items:center;gap:10px}
+.bar h1{font-size:22px;font-weight:800;color:#fff;margin-right:auto}
+.iconbtn{width:42px;height:42px;border-radius:14px;border:0;background:rgba(255,255,255,.92);color:var(--ink);display:grid;place-items:center;position:relative;flex:none}
+.iconbtn.ghost{background:rgba(255,255,255,.18);color:#fff}
+.iconbtn .badge{position:absolute;top:-4px;right:-4px;background:var(--bad);color:#fff;font-size:11px;font-weight:800;border-radius:999px;min-width:19px;height:19px;display:grid;place-items:center;padding:0 5px;border:2px solid #fff}
+.search{display:flex;align-items:center;gap:10px;background:#fff;border-radius:999px;padding:0 16px;min-height:46px;flex:1;min-width:0}
+.search .ic{color:var(--ink-2);width:19px;height:19px}
+.search input{border:0;outline:0;background:transparent;flex:1;min-width:0;padding:11px 0}
+.search:focus-within{box-shadow:0 0 0 3px rgba(19,82,94,.35)}
+.bar .search{margin-top:14px}
+
+/* home hero (reference: dark circle top-left, lime field, white search, three square tiles) */
+.hero{position:relative;overflow:hidden;padding:26px 22px 22px;background:linear-gradient(180deg,#D5E574 0%,#A9CC45 76%,#BFD968 100%);flex:none}
+.hero::before{content:"";position:absolute;width:430px;height:430px;border-radius:50%;background:linear-gradient(160deg,#1C6150,#15574F);left:-150px;top:-250px}
+.hero::after{content:"";position:absolute;width:300px;height:300px;border-radius:50%;background:#D8E880;right:-130px;top:-70px}
+.hero>*{position:relative;z-index:1}
+.hello{display:flex;align-items:flex-start;gap:12px}
+.hello div{margin-right:auto;color:#fff}
+.hello p{font-size:15px}
+.hello b{display:block;font-size:16px;font-weight:800}
+.tiles{display:flex;gap:16px;margin-top:20px}
+.tile{display:flex;flex-direction:column;align-items:center;gap:6px;border:0;background:none;padding:0;color:var(--ink)}
+.tile span.sq{width:68px;height:68px;border-radius:20px;background:var(--lime-pale);display:grid;place-items:center;box-shadow:0 4px 10px rgba(19,75,92,.10)}
+.tile span.sq .ic{width:26px;height:26px}
+.tile small{font-size:12px;font-weight:800}
+
+/* sections */
+.sec{padding:18px 18px 0}
+.sec-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:12px}
+.sec-h h2{font-size:20px;font-weight:800}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:12px;scrollbar-width:none}
+.chip{border:1.5px solid #CFE07A;background:#fff;border-radius:999px;padding:6px 14px;font-weight:700;font-size:13px;white-space:nowrap;min-height:34px;color:var(--ink)}
+.chip[aria-pressed="true"]{background:var(--teal);border-color:var(--teal);color:#fff}
+.stack{display:flex;flex-direction:column;gap:14px}
+.empty{text-align:center;color:var(--ink-2);padding:28px 10px;font-size:14px}
+
+/* posts */
+.post{padding:14px 16px 10px;display:flex;flex-direction:column;gap:10px}
+.post.official{box-shadow:0 0 0 2px #A9CB4F,var(--shadow)}
+.post-h{display:flex;align-items:center;gap:10px}
+.av{border-radius:50%;display:inline-grid;place-items:center;color:#fff;font-weight:800;font-size:13px;flex:none;object-fit:cover}
+.av.sdp{background:#fff;border:1.5px solid #CFE07A;color:var(--forest);font-size:11px}
+.who{min-width:0;margin-right:auto}
+.who .nm{font-weight:800;font-size:14px}
+.who .t,.who .dot{font-weight:600;color:var(--ink-3)}
+.who .cm{font-size:12px;color:var(--ink-2)}
+.type{font-size:11px;font-weight:800;border-radius:999px;padding:3px 9px;background:var(--lime-pale);color:var(--ink);white-space:nowrap}
+.type.t-tutorial{background:#D6ECE6;color:var(--teal)}
+.type.t-tip{background:#EAF3CF}
+.badge-off{font-size:10px;font-weight:800;background:var(--grad-lime);border-radius:6px;padding:1px 6px;color:var(--ink);vertical-align:2px}
+.post-title{font-size:16px;font-weight:800}
+.post-body{font-size:15px;cursor:pointer}
+.post-body.clamp{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.more{border:0;background:none;padding:0;color:#6E9C2A;font-weight:800;align-self:flex-start;margin-top:-6px;min-height:28px}
+.media{border-radius:16px;overflow:hidden;position:relative;background:var(--lime-wash)}
+.media img{display:block;width:100%;max-height:260px;object-fit:cover}
+.scene{display:block;width:100%;height:auto;aspect-ratio:16/9}
+.play{position:absolute;inset:0;border:0;background:rgba(18,82,79,.12);display:grid;place-items:center}
+.play span{width:62px;height:62px;border-radius:50%;background:rgba(255,255,255,.92);display:grid;place-items:center;color:var(--teal);box-shadow:0 6px 18px rgba(0,0,0,.15)}
+.play span .ic{width:26px;height:26px;fill:currentColor}
+.vbar{position:absolute;left:12px;right:12px;bottom:10px;display:flex;align-items:center;gap:8px;color:#fff;font-size:12px;font-weight:700;text-shadow:0 1px 2px rgba(0,0,0,.4)}
+.vbar i{flex:1;height:4px;border-radius:2px;background:rgba(255,255,255,.5);position:relative;overflow:hidden}
+.vbar i::after{content:"";position:absolute;inset:0;width:0;background:#fff;animation:prog 20s linear forwards}
+@keyframes prog{to{width:100%}}
+.dur{position:absolute;right:10px;bottom:10px;background:rgba(19,75,92,.8);color:#fff;font-size:12px;font-weight:800;border-radius:8px;padding:2px 7px}
+.post-f{display:flex;align-items:center;gap:6px;border-top:1px solid var(--line);padding-top:6px}
+.react{border:0;background:none;display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:10px;font-weight:800;color:var(--ink-2);min-height:40px}
+.react:hover{background:var(--lime-wash)}
+.react .ic{width:20px;height:20px}
+.react.liked{color:var(--forest)}
+.react.liked .ic{fill:#9DC53E}
+.react.ask{margin-left:auto;color:var(--forest)}
+
+/* comments */
+.comments{display:flex;flex-direction:column;gap:12px;padding:4px 2px}
+.cmt{display:flex;gap:10px}
+.cmt .bub{background:#fff;border-radius:16px;padding:10px 12px;box-shadow:var(--shadow);min-width:0}
+.cmt .bub p.n{font-size:13px;font-weight:800}
+.cmt .bub p.n span{font-weight:600;color:var(--ink-3)}
+.mentor{font-size:10px;font-weight:800;background:#D6ECE6;color:var(--teal);border-radius:6px;padding:1px 6px;margin-left:4px}
+.compose{position:absolute;left:0;right:0;bottom:78px;background:#fff;padding:10px 14px;display:flex;gap:8px;border-top:1px solid var(--line);z-index:4}
+.compose input{flex:1;min-width:0}
+.sendbtn{width:48px;height:48px;border-radius:50%;border:0;background:var(--grad-primary);color:#fff;display:grid;place-items:center;flex:none}
+
+/* rows (communities, trades, events, notifications) */
+.row{display:flex;align-items:center;gap:12px;padding:14px}
+.row .tic{width:48px;height:48px;border-radius:15px;background:var(--lime-pale);display:grid;place-items:center;flex:none;color:var(--ink)}
+.row .tic .ic{width:24px;height:24px}
+.row .mid{flex:1;min-width:0}
+.row .mid b{display:block;font-size:16px;font-weight:800}
+.row .mid small{display:block;font-size:12.5px;color:var(--ink-2);line-height:1.35}
+.row.tap{cursor:pointer}
+.joinbtn{border:0;border-radius:999px;padding:7px 16px;font-weight:800;font-size:14px;min-height:36px;background:var(--grad-lime);color:var(--ink);white-space:nowrap;flex:none}
+.joinbtn.on{background:#fff;border:1.6px solid var(--teal);color:var(--teal);display:flex;align-items:center;gap:4px}
+.joinbtn.on .ic{width:15px;height:15px}
+.joinbtn.dark{background:var(--grad-primary);color:#fff}
+.grp{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);margin:6px 2px 2px;display:flex;align-items:center;gap:8px}
+.grp .ic{width:15px;height:15px}
+.unread{width:9px;height:9px;border-radius:50%;background:var(--bad);flex:none}
+.notif-go{color:var(--teal)}
+.notif-go .ic{width:28px;height:28px}
+
+.trade-mid{flex:1;min-width:0;text-align:center}
+.trade-mid p{font-size:15px}
+.trade-mid p.w{font-weight:800;font-size:13px;color:var(--ink-2);text-transform:uppercase;letter-spacing:.06em}
+.trade-mid small{display:block;color:var(--ink-3);font-size:12px;margin-top:2px}
+.status{font-size:12px;font-weight:800;border-radius:999px;padding:4px 10px;white-space:nowrap}
+.s-open{background:var(--lime-pale)}
+.s-req{background:#FDF0CC;color:#7A5600}
+.s-acc{background:#D6ECE6;color:var(--teal)}
+.s-done{background:#E7EDEF;color:var(--ink-2)}
+.fab{position:absolute;left:50%;transform:translateX(-50%);bottom:92px;z-index:3;box-shadow:0 10px 24px rgba(19,75,92,.3)}
+.seg{display:flex;background:#fff;border-radius:999px;padding:4px;box-shadow:var(--shadow);margin-bottom:14px}
+.seg button{flex:1;border:0;background:none;border-radius:999px;padding:9px;font-weight:800;color:var(--ink-2);min-height:40px}
+.seg button[aria-pressed="true"]{background:var(--teal);color:#fff}
+
+/* upload boxes */
+.upload{display:block;border-radius:18px;background:#E9EEF1;border:1.6px dashed #A8BAC0;min-height:132px;position:relative;overflow:hidden;cursor:pointer}
+.upload input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.upload .ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:#6F8790;font-size:13px;font-weight:700}
+.upload .ph .ic{width:34px;height:34px}
+.upload img{width:100%;height:160px;object-fit:cover;display:block}
+.upload:focus-within{outline:3px solid #13525E;outline-offset:2px}
+.form{display:flex;flex-direction:column;gap:14px;padding:18px}
+.form h2{font-size:18px;font-weight:800}
+.radios{display:flex;gap:8px;flex-wrap:wrap}
+.radios label{display:flex;align-items:center;gap:6px;border:1.5px solid #CFE07A;border-radius:999px;padding:7px 14px;font-weight:700;font-size:14px;cursor:pointer;background:#fff;min-height:38px}
+.radios input{accent-color:var(--forest)}
+.radios label:has(input:checked){background:var(--lime-pale);border-color:var(--lime-2)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* events */
+.ev-hero{border-radius:20px;overflow:hidden;box-shadow:var(--shadow)}
+.info{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:14px}
+.info div{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:700;min-width:0}
+.info .ic{width:20px;height:20px;color:var(--teal)}
+.info .cap{grid-column:1/-1;display:flex;flex-direction:column;align-items:stretch;gap:6px}
+.info .capbar{display:block;height:8px;border-radius:4px;background:var(--lime-wash);overflow:hidden}
+.capbar i{display:block;height:100%;background:var(--grad-lime)}
+.sponsor{display:flex;gap:10px;align-items:center;background:var(--lime-wash);border:1.5px solid #CFE07A;border-radius:16px;padding:10px 12px;font-size:13px;font-weight:700}
+.sponsor .ic{color:var(--forest)}
+.role{display:flex;align-items:center;gap:10px;padding:10px 12px}
+.role .mid{flex:1}
+.role b{font-size:14px}
+.role small{display:block;color:var(--ink-2);font-size:12px}
+.sticky-cta{position:absolute;left:0;right:0;bottom:78px;padding:12px 18px;background:linear-gradient(180deg,rgba(247,250,249,0),var(--surface) 35%);z-index:3}
+
+/* auth */
+.welcome{position:relative;overflow:hidden;background:linear-gradient(180deg,#D5E574 0%,#A9CC45 80%);padding:34px 20px 92px;text-align:center}
+.welcome::before{content:"";position:absolute;width:520px;height:520px;border-radius:50%;background:linear-gradient(160deg,#1C6150,#15574F);left:-170px;top:-250px}
+.welcome::after{content:"";position:absolute;width:260px;height:260px;border-radius:50%;background:#D8E880;right:-120px;top:120px}
+.welcome>*{position:relative;z-index:1}
+.welcome-t{color:#fff;font-weight:800;font-size:20px}
+.logo-badge{width:168px;height:168px;margin:16px auto 0;border-radius:44px;background:#fff;display:grid;place-items:center;box-shadow:0 12px 30px rgba(10,40,40,.25)}
+.logo-badge img{width:132px;height:auto}
+.auth-card{margin:-64px 18px 0;position:relative;z-index:2;background:linear-gradient(180deg,#EEF5CC 0%,#FFFFFF 38%);border-radius:28px;padding:22px 20px;box-shadow:0 12px 30px rgba(19,75,92,.12);display:flex;flex-direction:column;gap:10px}
+.auth-card h1{font-size:24px;font-weight:800}
+.auth-card .sub{font-size:14px;color:var(--ink-2)}
+.or{text-align:center;color:var(--ink-3);font-size:13px}
+.center{align-self:center}
+
+/* profile */
+.pf{display:flex;flex-direction:column;align-items:center;gap:6px;padding:20px 18px 6px}
+.pf-av{position:relative;width:112px;height:112px}
+.pf-av .av{width:112px;height:112px;font-size:34px;border:4px solid #fff;box-shadow:var(--shadow)}
+.pf-av label{position:absolute;right:2px;bottom:2px;width:36px;height:36px;border-radius:50%;background:var(--grad-primary);color:#fff;display:grid;place-items:center;border:3px solid #fff;cursor:pointer}
+.pf-av label .ic{width:18px;height:18px}
+.pf-av input{position:absolute;width:1px;height:1px;opacity:0}
+.pf-av:focus-within label{outline:3px solid #13525E;outline-offset:2px}
+.kv{display:flex;align-items:flex-end;gap:10px;border-bottom:1.5px solid var(--line);padding:10px 2px 8px}
+.kv .mid{flex:1;min-width:0}
+.kv .mid span{display:block;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2)}
+.kv .mid p{font-size:16px;font-weight:700;overflow-wrap:anywhere}
+.kv input{width:100%;border:0;border-bottom:2px solid var(--lime-2);padding:4px 0;font-size:16px;font-weight:700;background:transparent;outline:0}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);text-align:center;padding:14px 0}
+.stats div+div{border-left:1.5px solid var(--line)}
+.stats b{display:block;font-size:22px;font-weight:800;font-variant-numeric:tabular-nums}
+.stats small{font-size:12.5px;color:var(--ink-2);font-weight:700}
+
+/* bottom nav */
+.nav{position:absolute;left:0;right:0;bottom:0;height:78px;background:#fff;border-radius:26px 26px 0 0;box-shadow:0 -6px 22px rgba(19,75,92,.10);display:grid;grid-template-columns:repeat(5,1fr);align-items:center;z-index:5;padding:0 6px}
+.nav button{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:12px;font-weight:700;color:var(--ink-3);min-height:56px;justify-content:center}
+.nav button[aria-current="page"]{color:var(--forest);font-weight:800}
+.nav button[aria-current="page"] .ic{stroke-width:2.4}
+.nav .plus span{width:56px;height:56px;border-radius:50%;background:var(--grad-primary);color:#fff;display:grid;place-items:center;margin-top:-26px;box-shadow:0 8px 18px rgba(19,75,92,.35);border:4px solid #fff}
+.nav .plus span .ic{width:26px;height:26px}
+
+/* sheet + toast */
+.scrim{position:absolute;inset:0;background:rgba(10,40,40,.35);z-index:8}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:#fff;border-radius:28px 28px 0 0;padding:10px 18px 24px;z-index:9;display:flex;flex-direction:column;gap:12px;box-shadow:0 -10px 30px rgba(0,0,0,.15)}
+.sheet .grab{width:44px;height:5px;border-radius:3px;background:#D5DFE2;align-self:center}
+.sheet h2{font-size:18px;font-weight:800}
+.opt{display:flex;align-items:center;gap:12px;border:0;background:var(--surface);border-radius:18px;padding:12px;text-align:left}
+.opt .tic{width:46px;height:46px;border-radius:14px;background:var(--lime-pale);display:grid;place-items:center;flex:none}
+.opt b{display:block;font-weight:800}
+.opt small{color:var(--ink-2);font-size:13px}
+.swapbox{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;background:var(--surface);border-radius:18px;padding:14px;text-align:center}
+.swapbox span{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2)}
+.swapbox b{display:block;font-size:15px}
+.toast{position:absolute;left:18px;right:18px;top:14px;background:var(--ink);color:#fff;border-radius:16px;padding:12px 16px;font-weight:700;font-size:14px;z-index:20;opacity:0;transform:translateY(10px);transition:.25s;pointer-events:none;display:flex;gap:10px;align-items:center}
+.toast.show{opacity:1;transform:none}
+.toast{transform:translateY(-10px)}.toast.show{transform:none}
+.toast .ic{color:#C9DD63}
+
+/* ---------- dashboard ---------- */
+.dash{max-width:1240px;margin:0 auto;padding-block:4px 48px;display:flex;flex-direction:column;gap:18px}
+.dhead{position:relative;overflow:hidden;border-radius:28px;background:linear-gradient(135deg,#15574F 0%,#13525E 60%,#1E6B3D 100%);color:#fff;padding:24px 26px}
+.dhead::after{content:"";position:absolute;width:340px;height:340px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#D5E574,#9DC53E);right:-110px;top:-170px;opacity:.95}
+.dhead>*{position:relative;z-index:1}
+.dhead-row{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}
+.dhead h1{font-size:30px;font-weight:800}
+.dhead p{color:#D7E9E2;font-size:15px}
+.dtitle{margin-right:auto;min-width:0}
+.filters{display:flex;gap:10px;flex-wrap:wrap}
+.filters label{display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#E7F2C4}
+.filters select{border:0;border-radius:999px;padding:9px 38px 9px 16px;font-weight:800;color:var(--ink);background-color:#fff;min-height:42px;appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--ink) 50%),linear-gradient(135deg,var(--ink) 50%,transparent 50%);background-position:calc(100% - 20px) 52%,calc(100% - 14px) 52%;background-size:6px 6px;background-repeat:no-repeat}
+.livepill{display:inline-flex;align-items:center;gap:8px;margin-top:12px;background:rgba(255,255,255,.14);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:700}
+.livepill i{width:8px;height:8px;border-radius:50%;background:#C9DD63;box-shadow:0 0 0 4px rgba(201,221,99,.3)}
+.dtabs{display:flex;gap:6px;background:#fff;border-radius:999px;padding:5px;box-shadow:var(--shadow);align-self:flex-start;flex-wrap:wrap}
+.dtabs button{border:0;background:none;border-radius:999px;padding:9px 18px;font-weight:800;color:var(--ink-2);min-height:40px}
+.dtabs button[aria-pressed="true"]{background:var(--teal);color:#fff}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(178px,1fr));gap:14px}
+.kpi{background:#fff;border-radius:22px;padding:16px 18px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:4px;min-width:0}
+.kpi .k{display:flex;align-items:center;gap:8px;font-weight:800;font-size:14px;color:var(--ink-2)}
+.kpi .k span.i{width:32px;height:32px;border-radius:10px;background:var(--lime-pale);display:grid;place-items:center;color:var(--ink)}
+.kpi .k .ic{width:18px;height:18px}
+.kpi .v{font-size:34px;font-weight:800;line-height:1.1;font-variant-numeric:tabular-nums;margin-top:6px}
+.kpi .s{font-size:13.5px;color:var(--ink-2);font-weight:600}
+.delta{display:inline-flex;align-items:center;gap:3px;font-size:12px;font-weight:800;border-radius:999px;padding:2px 8px;align-self:flex-start;margin-top:4px}
+.delta.up{background:#DDF0E3;color:var(--good)}
+.delta.down{background:#F9E1DE;color:var(--bad)}
+.delta.flat{background:#E7EDEF;color:var(--ink-2)}
+.dgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,460px),1fr));gap:16px}
+.dgrid.three{grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr))}
+.panel{background:#fff;border-radius:22px;padding:20px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:14px;min-width:0}
+.panel h2{font-size:18px;font-weight:800}
+.panel .ph-row{display:flex;align-items:baseline;gap:10px;justify-content:space-between;flex-wrap:wrap}
+.panel .hint{font-size:13px;color:var(--ink-3)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;font-weight:700;color:var(--ink-2)}
+.legend span{display:flex;align-items:center;gap:6px}
+.legend i{width:12px;height:12px;border-radius:4px}
+.chart{width:100%;height:auto;display:block}
+.chart text{font-family:var(--font);font-size:11px;fill:#5F7F86}
+.bars{display:flex;flex-direction:column;gap:10px}
+.brow{display:grid;grid-template-columns:minmax(90px,130px) 1fr 44px auto;gap:10px;align-items:center;border:0;background:none;padding:4px 6px;border-radius:12px;text-align:left;width:100%}
+.brow:hover{background:var(--surface)}
+.brow .nm{font-weight:800;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.track{height:12px;border-radius:6px;background:#EEF2EA;overflow:hidden}
+.track i{display:block;height:100%;border-radius:6px}
+.brow .n{font-weight:800;text-align:right;font-variant-numeric:tabular-nums}
+.health{font-size:11.5px;font-weight:800;border-radius:999px;padding:3px 9px;white-space:nowrap;display:inline-flex;align-items:center;gap:5px}
+.health::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.h-good{background:#DDF0E3;color:var(--good)}
+.h-warn{background:#FBEFCF;color:#8A5F00}
+.h-bad{background:#F9E1DE;color:var(--bad)}
+.cmp{display:flex;flex-direction:column;gap:10px}
+.cmp .r{display:grid;grid-template-columns:110px 1fr 48px;gap:10px;align-items:center;font-weight:700;font-size:14px}
+.cmp .r b{text-align:right;font-variant-numeric:tabular-nums}
+.big2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.big2 div{background:var(--surface);border-radius:16px;padding:12px 14px}
+.big2 small{display:block;font-size:12.5px;color:var(--ink-2);font-weight:700}
+.big2 b{font-size:24px;font-weight:800;font-variant-numeric:tabular-nums}
+.big2 b em{font-style:normal;font-size:14px;color:var(--ink-3);font-weight:700}
+.topics{display:flex;flex-direction:column;gap:8px}
+.topic{display:grid;grid-template-columns:1fr 2fr 36px;gap:10px;align-items:center;font-size:14px;font-weight:700}
+.topic .track i{background:var(--grad-lime)}
+.topic b{text-align:right;font-variant-numeric:tabular-nums}
+.callout{background:var(--lime-wash);border-radius:14px;padding:10px 12px;font-size:13.5px;font-weight:700;display:flex;gap:8px;align-items:flex-start}
+.callout .ic{width:18px;height:18px;color:var(--forest);margin-top:1px}
+.feedlist{display:flex;flex-direction:column;gap:10px;list-style:none;margin:0;padding:0}
+.feedlist li{display:flex;gap:10px;align-items:flex-start;font-size:14px;font-weight:600}
+.feedlist .ic{width:18px;height:18px;margin-top:2px}
+.feedlist .ok{color:var(--good)}.feedlist .wa{color:var(--warn)}.feedlist .lv{color:var(--teal)}
+.feedlist small{display:block;color:var(--ink-3);font-size:12px}
+.actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}
+.act{border:1.6px solid #CFE07A;background:#fff;border-radius:16px;padding:12px 14px;display:flex;align-items:center;gap:10px;font-weight:800;text-align:left;min-height:56px}
+.act:hover{background:var(--lime-wash)}
+.act .ic{color:var(--forest)}
+.act small{display:block;font-weight:600;font-size:12px;color:var(--ink-2)}
+.tbl-wrap{overflow-x:auto}
+table.tbl{width:100%;border-collapse:collapse;font-size:14px;min-width:760px}
+.tbl th{text-align:left;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2);padding:8px 10px;border-bottom:1.5px solid var(--line)}
+.tbl td{padding:12px 10px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+.tbl td.num,.tbl th.num{text-align:right}
+.tbl b{font-weight:800}
+.note{font-size:13px;color:var(--ink-2)}
+.netlist{display:flex;flex-direction:column;gap:8px}
+.netlist div{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700}
+.netlist .ic{width:16px;height:16px;color:var(--teal)}
+.netlist b{margin-left:auto;font-variant-numeric:tabular-nums}
+.ann{border:1px solid var(--line);border-radius:16px;padding:12px 14px}
+.ann b{display:block}
+.ann small{color:var(--ink-3);font-size:12px}
+
+/* modal */
+.modal-scrim{position:fixed;inset:0;background:rgba(10,40,40,.45);z-index:50;display:grid;place-items:center;padding:16px}
+.modal{background:#fff;border-radius:24px;width:min(520px,100%);max-height:calc(100dvh - 32px);overflow:auto;padding:22px;display:flex;flex-direction:column;gap:14px;box-shadow:0 20px 50px rgba(0,0,0,.25)}
+.modal h2{font-size:20px;font-weight:800}
+.modal .mrow{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+.modal textarea.report{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;min-height:260px;border-radius:14px}
+.dtoast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);background:var(--ink);color:#fff;border-radius:16px;padding:12px 18px;font-weight:700;opacity:0;transition:.25s;z-index:60;pointer-events:none;max-width:calc(100% - 32px)}
+.dtoast.show{opacity:1;transform:translate(-50%,0)}
+
+@media (max-width:520px){
+  body:has(#appView:not([hidden])){padding-left:0;padding-right:0;background:var(--surface)}
+  body:has(#appView:not([hidden])) .topbar{display:none}
+  #appView{padding-block:0;gap:0}
+  #appView .guide{display:none}
+  #appView .phone{width:100%;height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));min-height:0;border-radius:0;box-shadow:none}
+  .brand span{display:none}
+  .switch button{padding:8px 12px}
+  .dhead h1{font-size:24px}
+  .kpi .v{font-size:28px}
+  .brow{grid-template-columns:84px 1fr 34px}
+  .brow .health{display:none}
+  .two{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+<style>
+:root{padding:0}
+@media (max-width:520px){
+  #appView .phone{height:100dvh}
+  .bar{padding-top:calc(18px + env(safe-area-inset-top,0px))}
+  .hero{padding-top:calc(26px + env(safe-area-inset-top,0px))}
+  .welcome{padding-top:calc(34px + env(safe-area-inset-top,0px))}
+  .toast{top:calc(14px + env(safe-area-inset-top,0px))}
+  .nav{height:calc(78px + env(safe-area-inset-bottom,0px));padding-bottom:env(safe-area-inset-bottom,0px)}
+  .compose,.sticky-cta{bottom:calc(78px + env(safe-area-inset-bottom,0px))}
+  .fab{bottom:calc(92px + env(safe-area-inset-bottom,0px))}
+  .scroll{padding-bottom:calc(104px + env(safe-area-inset-bottom,0px))}
+  .topbar{padding-top:calc(14px + env(safe-area-inset-top,0px))}
+}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><img class="m" src="mark.webp" alt=""><img class="w" src="word.webp" alt="Serumpun"><span>Prototype · SDP University Hackathon 2026</span></div>
+  <div class="switch" role="group" aria-label="Choose view">
+    <button id="vApp" data-view="app" aria-pressed="true"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>Resident app</button>
+    <button id="vDash" data-view="dashboard" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Township Dashboard</button>
+  </div>
+  <button class="reset" id="resetBtn" type="button"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>Reset demo</button>
+</header>
+
+<main id="appView" class="stage">
+  <div class="phone" id="phone"><div id="screenRoot"></div><div class="toast" id="toast" role="status" aria-live="polite"></div></div>
+  <aside class="guide" aria-label="Demo guide">
+    <div class="gcard">
+      <h2>Demo guide</h2>
+      <p>Every button in the phone works. Jump to any screen from the low-fidelity design:</p>
+      <div class="jump" id="jump"></div>
+    </div>
+    <div class="gcard">
+      <h2>Try this flow</h2>
+      <ol class="steps">
+        <li><b>Log in</b> with the filled-in details.</li>
+        <li><b>Like or answer</b> a question in the main feed.</li>
+        <li>Open <b>Communities</b> and join USJ 13.</li>
+        <li><b>Trade</b> with Rosli, then mark it done in My trades.</li>
+        <li><b>Join</b> Greenhouse cleaning and volunteer for a role.</li>
+        <li>Switch to the <b>Township Dashboard</b> to see your actions counted.</li>
+      </ol>
+      <p class="livecount">Your actions so far <span class="n" id="liveN">0</span></p>
+    </div>
+    <div class="gcard"><p>All names and numbers are sample data for the prototype. Your changes stay in this browser until you press Reset demo.</p></div>
+  </aside>
+</main>
+
+<main id="dashView" hidden><div class="dash" id="dash"></div></main>
+<div id="modalRoot"></div>
+<div class="dtoast" id="dtoast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+"use strict";
+const $=(s,r=document)=>r.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const MIN=60000,H=60*MIN,D=24*H;
+
+/* ---------- icons ---------- */
+const I={
+home:'<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',
+cal:'<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
+chat:'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+chat2:'<path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8z"/>',
+pin:'<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>',
+users:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+tent:'<path d="M3.5 21 14 3"/><path d="M20.5 21 10 3"/><path d="M15.5 21 12 15l-3.5 6"/><path d="M2 21h20"/>',
+plus:'<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>',
+swap:'<path d="M8 3 4 7l4 4"/><path d="M4 7h16"/><path d="m16 21 4-4-4-4"/><path d="M20 17H4"/>',
+user:'<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+bell:'<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>',
+search:'<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>',
+thumb:'<path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/>',
+back:'<line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>',
+chev:'<polyline points="9 18 15 12 9 6"/>',
+go:'<circle cx="12" cy="12" r="10"/><polyline points="12 16 16 12 12 8"/><line x1="8" y1="12" x2="16" y2="12"/>',
+img:'<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>',
+play:'<polygon points="7 4 20 12 7 20 7 4"/>',
+pause:'<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>',
+clock:'<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+pencil:'<path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/>',
+check:'<polyline points="20 6 9 17 4 12"/>',
+x:'<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
+leaf:'<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>',
+mega:'<path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/>',
+gift:'<polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>',
+gh:'<path d="M3 21V10l9-7 9 7v11"/><path d="M3 21h18"/><path d="M12 3v18"/><path d="M3 13h18"/>',
+report:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/>',
+warn:'<path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
+out:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>',
+dash:'<rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/>',
+send:'<line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>',
+net:'<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>',
+book:'<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>',
+sprout:'<path d="M7 20h10"/><path d="M10 20c5.5-2.5.8-6.4 3-10"/><path d="M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z"/><path d="M14.1 6a7 7 0 0 0-1.1 4c1.9-.1 3.3-.6 4.3-1.4 1-1 1.6-2.3 1.7-4.6-2.7.1-4 1-4.9 2z"/>',
+link:'<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',
+copy:'<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
+up:'<polyline points="18 15 12 9 6 15"/>',
+down:'<polyline points="6 9 12 15 18 9"/>'
+};
+const ic=(n,c="")=>`<svg class="ic ${c}" viewBox="0 0 24 24" aria-hidden="true">${I[n]||""}</svg>`;
+
+/* ---------- communities (shared by app + dashboard) ---------- */
+const COMMS=[
+ {id:"usj18",name:"USJ 18",area:"USJ 18, Subang Jaya",addr:"47630 Subang Jaya, Selangor Darul Ehsan",township:"Subang Jaya (USJ)",members:25,level:1.0,trend:.25,mentors:6,organiser:"Rosli Ahmad"},
+ {id:"usj16",name:"USJ 16",area:"USJ 16, Subang Jaya",addr:"47630 Subang Jaya, Selangor Darul Ehsan",township:"Subang Jaya (USJ)",members:18,level:.78,trend:.1,mentors:4,organiser:"Chin Wei"},
+ {id:"usj13",name:"USJ 13",area:"USJ 13, Subang Jaya",addr:"47630 Subang Jaya, Selangor Darul Ehsan",township:"Subang Jaya (USJ)",members:31,level:.42,trend:-.25,mentors:3,organiser:"Ahmad Zaki"},
+ {id:"elmgar",name:"Elmina Gardens",area:"Elmina Gardens, City of Elmina",addr:"40160 Shah Alam, Selangor Darul Ehsan",township:"City of Elmina",members:42,level:.9,trend:.3,mentors:7,organiser:"Kumar Selvam"},
+ {id:"elmwest",name:"Elmina West",area:"Elmina West, City of Elmina",addr:"40160 Shah Alam, Selangor Darul Ehsan",township:"City of Elmina",members:14,level:.6,trend:.05,mentors:2,organiser:"Nurul Huda"},
+ {id:"bkraja",name:"Bukit Raja 2",area:"Bandar Bukit Raja 2, Klang",addr:"41050 Klang, Selangor Darul Ehsan",township:"Bandar Bukit Raja",members:11,level:.26,trend:-.45,mentors:1,organiser:"Lim Mei Ling"}
+];
+const TOWNSHIPS=[...new Set(COMMS.map(c=>c.township))];
+const cbase=id=>COMMS.find(c=>c.id===id)||COMMS[0];
+
+/* ---------- seed data ---------- */
+function seed(){
+ const now=Date.now();
+ return {
+  v:4, loggedIn:false,
+  user:{name:"Fahim Azizi",email:"fahim.azizi@example.com",avatar:null,home:"usj18",dob:"2001-05-14",since:now-372*D,basePosts:6,baseContrib:30},
+  joined:{usj18:true,usj16:true,elmgar:true},
+  memberAdj:{},
+  posts:[
+   {id:"p1",author:"Rosli Ahmad",comm:"usj18",t:now-2*H,type:"Question",title:"",body:"Macam mana nak tanam pokok? Baru beli anak pokok limau, nak tanam dalam pasu atau terus dalam tanah?",media:{kind:"image",scene:"seedlings"},likes:40,liked:false,comments:[
+     {author:"Mak Som",mentor:true,text:"Kalau tanah rumah liat, lebih baik guna pasu besar dulu. Campur tanah hitam, kompos dan sedikit pasir.",t:now-90*MIN},
+     {author:"Chin Wei",text:"Saya ada pasu 18 inci lebih. Boleh trade dengan benih.",t:now-70*MIN},
+     {author:"Aina Rahman",text:"Siram pagi sahaja, jangan bagi air bertakung.",t:now-40*MIN}]},
+   {id:"p2",author:"Chin Wei",comm:"usj16",t:now-2*H-25*MIN,type:"Tutorial",title:"How to grow a mango tree",body:"Here are some tutorial videos on how to grow them from seed, and when to move the seedling into the ground.",media:{kind:"video",scene:"mango",dur:"4:12"},likes:40,liked:false,comments:[
+     {author:"Adib Nurman",text:"Terima kasih! Video kedua sangat membantu.",t:now-H},
+     {author:"Wahab Samad",text:"Boleh share part cantuman juga?",t:now-30*MIN}]},
+   {id:"p3",author:"Siti Aishah",comm:"usj18",t:now-5*H,type:"Question",title:"",body:"Daun cili saya kerinting dan ada bintik putih di bawah daun. Kenapa ya?",media:{kind:"image",scene:"chilli"},likes:18,liked:false,comments:[
+     {author:"Mak Som",mentor:true,text:"Itu biasanya hama thrips. Sembur air sabun cair (1 sudu kecil sabun dalam 1 liter air) setiap 3 hari, waktu petang.",t:now-4*H}]},
+   {id:"p6",author:"Kumar Selvam",comm:"elmgar",t:now-1*D,type:"Tip",title:"Kompos dari sisa dapur: 3 langkah mudah",body:"Kumpul kulit sayur dan buah, campur dengan daun kering 1:1, dan gaul seminggu sekali. Dalam 6 hingga 8 minggu kompos dah boleh guna untuk pasu dan batas.",media:{kind:"image",scene:"compost"},likes:27,liked:false,comments:[]},
+   {id:"p4",author:"Adib Nurman",comm:"elmgar",t:now-2*D,type:"Question",title:"",body:"Ada yang tahu berapa lama pokok mangga nak berbuah?",media:null,likes:30,liked:false,comments:[
+     {author:"Kumar Selvam",mentor:true,text:"Kalau tanam dari biji, 5 hingga 8 tahun. Pokok cantuman lebih cepat, sekitar 3 tahun.",t:now-2*D+3*H},
+     {author:"Nurul Huda",text:"Pokok cantuman saya berbuah tahun ketiga.",t:now-1*D}]},
+   {id:"p5",author:"Wahab Samad",comm:"usj18",t:now-2*D-3*H,type:"Tip",title:"10 things you need to know before starting gardening as a hobby",body:"1. Start with 3 to 5 easy plants: kangkung, cili, serai, pandan and daun kesum.\n2. Check how many hours of direct sun your spot gets.\n3. Use pots with drainage holes.\n4. Mix soil, compost and a little sand.\n5. Water in the morning, not at noon.\n6. Check under the leaves for pests every few days.\n7. Turn kitchen scraps into compost.\n8. Keep a simple log of what you planted and when.\n9. Swap seedlings with neighbours instead of buying everything.\n10. Ask the community when something looks wrong.",media:null,likes:23,liked:false,comments:[
+     {author:"Siti Aishah",text:"Nombor 6 sangat penting. Saya terlambat perasan hama.",t:now-2*D}]},
+   {id:"p7",author:"Ahmad Zaki",comm:"usj13",t:now-3*D,type:"Tip",title:"",body:"Greenhouse USJ 13 perlukan sukarelawan untuk baiki bumbung plastik sebelum musim hujan. Sesiapa ada pengalaman, sila komen.",media:{kind:"image",scene:"greenhouse"},likes:9,liked:false,comments:[]},
+   {id:"p8",author:"Lim Mei Ling",comm:"bkraja",t:now-6*D,type:"Question",title:"",body:"Ada sesiapa di Bukit Raja 2 berminat nak hidupkan semula kebun komuniti kita?",media:null,likes:4,liked:false,comments:[]},
+   {id:"p9",author:"Nurul Huda",comm:"elmwest",t:now-3*D,type:"Tip",title:"Hydroponik botol untuk rumah teres",body:"Sawi dan salad boleh tumbuh dalam botol 1.5 liter dengan baja AB. Tak perlu tanah langsung.",media:{kind:"image",scene:"seedlings"},likes:15,liked:false,comments:[]}
+  ],
+  trades:[
+   {id:"t1",give:"Baja organik",want:"Benih pokok",by:"Rosli Ahmad",comm:"usj18",t:now-3*H,status:"open"},
+   {id:"t2",give:"Anak pokok cili (3)",want:"Pasu 12 inci",by:"Aina Rahman",comm:"usj18",t:now-6*H,status:"open"},
+   {id:"t3",give:"Kompos (5 kg)",want:"Keratan pandan",by:"Kumar Selvam",comm:"elmgar",t:now-1*D,status:"open"},
+   {id:"t4",give:"Benih kangkung",want:"Baja organik",by:"Chin Wei",comm:"usj16",t:now-2*D,status:"open"},
+   {id:"t6",give:"Benih bendi",want:"Keratan serai",by:"Ahmad Zaki",comm:"usj13",t:now-3*D,status:"open"},
+   {id:"t5",give:"Keratan serai",want:"Benih bendi",by:"Fahim Azizi",comm:"usj18",t:now-4*D,status:"mine",mine:true}
+  ],
+  events:[
+   {id:"e1",title:"Greenhouse cleaning",comm:"usj18",date:"2026-11-20",time:"17:00",place:"USJ 18 Greenhouse",going:10,cap:20,joined:false,scene:"greenhouse",organiser:"Rosli Ahmad",sponsor:null,
+    desc:"USJ 18 Greenhouse Community will hold a communal cleaning and fertilisation session. We will clear old pots, wash the shade netting and add baja organik to every bed. Gloves and tools are provided. Bring your own water bottle.",
+    roles:[{name:"Logistics",need:2,filled:1,mine:false},{name:"Refreshments",need:1,filled:0,mine:false},{name:"Photographer",need:1,filled:1,mine:false}]},
+   {id:"e2",title:"Bengkel tanam ubi",comm:"usj16",date:"2026-11-28",time:"09:00",place:"USJ 16 Community Garden",going:14,cap:25,joined:false,scene:"seedlings",organiser:"Chin Wei",sponsor:null,
+    desc:"Bengkel praktikal menanam ubi kayu dan ubi keledek dalam guni. Setiap peserta bawa pulang satu guni yang sudah ditanam.",
+    roles:[{name:"Speaker",need:1,filled:1,mine:false},{name:"Registration desk",need:2,filled:0,mine:false}]},
+   {id:"e3",title:"Seedling swap day",comm:"elmgar",date:"2026-12-06",time:"08:30",place:"Elmina Gardens Clubhouse",going:22,cap:40,joined:false,scene:"swap",organiser:"Kumar Selvam",sponsor:null,
+    desc:"Bring your extra seedlings, cuttings and seeds and swap them with neighbours. Mentors will be at the help table for plant questions.",
+    roles:[{name:"Setup crew",need:3,filled:2,mine:false},{name:"Help table mentor",need:2,filled:1,mine:false}]},
+   {id:"e4",title:"Greenhouse cleaning",comm:"usj13",date:"2026-12-13",time:"17:00",place:"USJ 13 Greenhouse",going:3,cap:20,joined:false,scene:"greenhouse",organiser:"Ahmad Zaki",sponsor:null,
+    desc:"Cleaning day for the USJ 13 greenhouse and repairs to the plastic roof before the rainy season.",
+    roles:[{name:"Logistics",need:2,filled:0,mine:false},{name:"Roof repair",need:3,filled:1,mine:false}]}
+  ],
+  notifs:[
+   {id:"n1",icon:"tent",title:"Greenhouse cleaning",body:"USJ 18 Greenhouse deep cleaning and fertilisation on 20 Nov",t:now-1*H,read:false,link:["event","e1"]},
+   {id:"n2",icon:"swap",title:"New trade offer",body:"Rosli Ahmad: trade baja organik with benih pokok",t:now-3*H,read:false,link:["trade"]},
+   {id:"n3",icon:"swap",title:"New trade offer",body:"Aina Rahman: trade anak pokok cili with pasu 12 inci",t:now-6*H,read:false,link:["trade"]},
+   {id:"n4",icon:"chat",title:"Mak Som answered a question",body:"On Siti Aishah's post about curly chilli leaves",t:now-4*H,read:true,link:["post","p3"]}
+  ],
+  announcements:[],
+  offers:[],
+  live:[]
+ };
+}
+
+/* ---------- state ---------- */
+const KEY="serumpun-proto-v4";
+let state=load()||seed();
+const ui={view:"app",screen:state.loggedIn?"home":"login",params:{},stack:[],sheet:null,feed:"all",tradeTab:"offers",evTab:"upcoming",commTab:"posts",q:"",expanded:{},playing:null,editing:null,draft:{},onboard:false};
+const dash={township:"all",weeks:8,tab:"overview",modal:null};
+function load(){try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s&&s.v===4)return s;}catch(e){}return null;}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
+const uid=p=>p+Math.random().toString(36).slice(2,8);
+function logLive(text,comm,kind){state.live.unshift({t:Date.now(),text,comm,kind});}
+
+/* ---------- helpers ---------- */
+function ago(t){const s=(Date.now()-t)/1000;if(s<60)return"just now";const m=s/60;if(m<60)return Math.floor(m)+"m ago";const h=m/60;if(h<24)return Math.floor(h)+"h ago";const d=h/24;if(d<7)return Math.floor(d)+"d ago";return Math.floor(d/7)+"w ago";}
+const MON=["January","February","March","April","May","June","July","August","September","October","November","December"];
+function fmtDate(iso,short){const[y,m,d]=iso.split("-").map(Number);return short?`${d} ${MON[m-1].slice(0,3)}`:`${d} ${MON[m-1]} ${y}`;}
+function fmtTime(hm){let[h,m]=hm.split(":").map(Number);const ap=h>=12?"PM":"AM";h=h%12||12;return`${h}:${String(m).padStart(2,"0")} ${ap}`;}
+function initials(n){return n.split(/\s+/).filter(Boolean).slice(0,2).map(w=>w[0]).join("").toUpperCase();}
+function avColor(n){const cols=["#1E6B3D","#13525E","#4F7F28","#2F7D6B","#6E8A25","#3B6E80","#7A5A1E"];let h=0;for(const ch of n)h=(h*31+ch.charCodeAt(0))>>>0;return cols[h%cols.length];}
+function avatar(name,size=38,img){
+ if(img)return`<img class="av" style="width:${size}px;height:${size}px" src="${img}" alt="">`;
+ if(name==="Sime Darby Property")return`<span class="av sdp" style="width:${size}px;height:${size}px" aria-hidden="true">SDP</span>`;
+ return`<span class="av" style="width:${size}px;height:${size}px;background:${avColor(name)}" aria-hidden="true">${esc(initials(name))}</span>`;
+}
+function comm(id){const b=cbase(id);return{...b,members:b.members+(state.memberAdj[id]||0)};}
+const joinedIds=()=>COMMS.filter(c=>state.joined[c.id]).map(c=>c.id);
+const isMe=n=>n===state.user.name;
+const unread=()=>state.notifs.filter(n=>!n.read).length;
+function postVisibleIn(p,ids){return p.targets?p.targets.some(t=>ids.includes(t)):ids.includes(p.comm);}
+
+/* ---------- illustrated scenes for photos ---------- */
+let sn=0;
+function scene(kind){
+ const n=++sn;
+ const leaf=(x,y,r,s=1,c="#3E8E3B")=>`<path transform="translate(${x} ${y}) rotate(${r}) scale(${s})" d="M0 0 C7 -8 7 -22 0 -30 C-7 -22 -7 -8 0 0Z" fill="${c}"/>`;
+ const pot=x=>`<path d="M${x-18} 128 h36 l-5 30 h-26z" fill="#13525E"/><rect x="${x-21}" y="121" width="42" height="9" rx="3" fill="#1E6B3D"/>`;
+ let b="",label="Garden photo";
+ if(kind==="seedlings"||kind==="swap"){label="Seedlings in pots";b=[80,160,240].map((x,i)=>pot(x)+`<path d="M${x} 122 V${100-i*8}" stroke="#2F7D3C" stroke-width="3" fill="none"/>`+leaf(x,108-i*8,-48,.8)+leaf(x,108-i*8,48,.8,"#6BA83A")+leaf(x,100-i*8,0,.75,"#8DBE3A")).join("");
+  if(kind==="swap"){label="Seedling swap";b+=`<path d="M120 60 h80" stroke="#13525E" stroke-width="4" stroke-linecap="round"/><path d="M190 52 l10 8 -10 8" stroke="#13525E" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M200 76 h-80" stroke="#1E6B3D" stroke-width="4" stroke-linecap="round"/><path d="M130 68 l-10 8 10 8" stroke="#1E6B3D" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;}}
+ else if(kind==="greenhouse"){label="Community greenhouse";b=`<path d="M62 152 V96 Q160 26 258 96 V152Z" fill="#E4F2EE" stroke="#13525E" stroke-width="4"/><path d="M110 152 V64 M160 152 V48 M210 152 V64 M62 112 H258" stroke="#13525E" stroke-width="2.5" opacity=".55" fill="none"/><rect x="146" y="118" width="28" height="34" rx="3" fill="#13525E"/>`+[84,100,124,196,220,238].map((x,i)=>leaf(x,150,(i%2?18:-18),.65,i%3?"#6BA83A":"#2F7D3C")).join("");}
+ else if(kind==="mango"){label="Mango tree";b=`<path d="M160 160 C158 132 163 112 160 92" stroke="#6B4F2A" stroke-width="10" fill="none" stroke-linecap="round"/><circle cx="160" cy="70" r="44" fill="#2F7D3C"/><circle cx="124" cy="84" r="30" fill="#3E8E3B"/><circle cx="198" cy="84" r="30" fill="#3E8E3B"/><circle cx="160" cy="54" r="30" fill="#6BA83A"/>`+[[140,96],[176,100],[200,80],[124,70]].map(([x,y])=>`<ellipse cx="${x}" cy="${y}" rx="7" ry="10" fill="#F2B134"/>`).join("");}
+ else if(kind==="chilli"){label="Chilli plant";b=pot(160)+`<path d="M160 122 V70 M160 100 L132 80 M160 92 L190 72" stroke="#2F7D3C" stroke-width="4" fill="none" stroke-linecap="round"/>`+leaf(132,80,-60,.9)+leaf(190,72,60,.9,"#6BA83A")+leaf(160,70,0,.9,"#8DBE3A")+leaf(146,104,-70,.7,"#6BA83A")+[[140,92],[176,86],[168,104]].map(([x,y])=>`<path d="M${x} ${y} q4 14 -2 24 q-6 -10 2 -24z" fill="#D9483B"/>`).join("");}
+ else if(kind==="compost"){label="Compost bin";b=`<rect x="110" y="84" width="100" height="72" rx="8" fill="#13525E"/><rect x="104" y="74" width="112" height="14" rx="5" fill="#1E6B3D"/><path d="M130 110 h60 M130 128 h60" stroke="#E4F2EE" stroke-width="3" opacity=".5"/><ellipse cx="250" cy="152" rx="34" ry="12" fill="#8A6A3B"/>`+leaf(240,146,-30,.6)+leaf(262,148,40,.6,"#C9DD63")+leaf(70,150,-20,.7,"#6BA83A")+leaf(86,150,25,.6,"#8DBE3A");}
+ return`<svg class="scene" viewBox="0 0 320 180" role="img" aria-label="${label}"><defs><linearGradient id="sk${n}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#EEF5C8"/><stop offset="1" stop-color="#FFFFFF"/></linearGradient></defs><rect width="320" height="180" fill="url(#sk${n})"/><circle cx="268" cy="40" r="20" fill="#F6E58D"/><path d="M0 150 Q80 128 160 142 T320 136 V180 H0Z" fill="#B9D65A"/><path d="M0 164 Q100 152 200 162 T320 158 V180 H0Z" fill="#8DBE3A"/>${b}</svg>`;
+}
+
+/* ---------- UI pieces ---------- */
+function bell(){const u=unread();return`<button class="iconbtn" data-act="go" data-s="notifications" aria-label="Notifications${u?", "+u+" unread":""}">${ic("bell")}${u?`<span class="badge">${u}</span>`:""}</button>`;}
+function bar(title,{back=true,search=null,right=""}={}){
+ return`<div class="bar"><div class="bar-row">${back&&ui.stack.length?`<button class="iconbtn ghost" data-act="back" aria-label="Back">${ic("back")}</button>`:""}<h1>${esc(title)}</h1>${right}${bell()}</div>${search?`<label class="search"><span class="sr">${esc(search)}</span>${ic("search")}<input id="q" type="search" placeholder="${esc(search)}" value="${esc(ui.q)}" autocomplete="off"></label>`:""}</div>`;
+}
+function mediaHTML(p){
+ const m=p.media;if(!m)return"";
+ if(m.kind==="photo")return`<div class="media"><img src="${m.src}" alt="Photo shared by ${esc(p.author)}"></div>`;
+ if(m.kind==="video"){const on=ui.playing===p.id;return`<div class="media">${scene(m.scene)}<button class="play" data-act="play" data-id="${p.id}" aria-label="${on?"Pause":"Play"} tutorial video">${on?`<span>${ic("pause")}</span>`:`<span>${ic("play")}</span>`}</button>${on?`<div class="vbar"><span>Playing</span><i></i><span>${m.dur}</span></div>`:`<span class="dur">${m.dur}</span>`}</div>`;}
+ return`<div class="media">${scene(m.scene)}</div>`;
+}
+function targetLabel(t){if(!t)return"";if(t.length===COMMS.length)return"All Serumpun communities";const tw=TOWNSHIPS.find(w=>{const ids=COMMS.filter(c=>c.township===w).map(c=>c.id);return ids.length===t.length&&ids.every(i=>t.includes(i));});return tw?tw:t.map(i=>cbase(i).name).join(", ");}
+function postCard(p,full=false){
+ const c=cbase(p.comm);const long=p.body.length>150||p.body.includes("\n");const open=full||ui.expanded[p.id];
+ return`<article class="post card${p.official?" official":""}">
+ <header class="post-h">${avatar(p.author,38,isMe(p.author)?state.user.avatar:null)}<div class="who"><p class="nm">${esc(p.author)}${p.official?' <span class="badge-off">Official</span>':""} <span class="dot">·</span> <span class="t">${ago(p.t)}</span></p><p class="cm">${p.official?esc(targetLabel(p.targets)):"Community "+esc(c.name)}</p></div>${p.type?`<span class="type t-${p.type.toLowerCase()}">${p.type}</span>`:""}</header>
+ ${p.title?`<h3 class="post-title">${esc(p.title)}</h3>`:""}
+ <div class="post-body${long&&!open?" clamp":""}" ${full?"":`data-act="openPost" data-id="${p.id}"`}>${esc(p.body).replace(/\n/g,"<br>")}</div>
+ ${long&&!open?`<button class="more" data-act="expand" data-id="${p.id}">Tap to see more</button>`:""}
+ ${mediaHTML(p)}
+ <footer class="post-f"><button class="react${p.liked?" liked":""}" data-act="like" data-id="${p.id}" aria-pressed="${!!p.liked}" aria-label="Like. ${p.likes} likes">${ic("thumb")}<span>${p.likes}</span></button><button class="react" data-act="openPost" data-id="${p.id}" aria-label="${p.comments.length} comments">${ic("chat2")}<span>${p.comments.length}</span></button>${full?"":`<button class="react ask" data-act="openPost" data-id="${p.id}">${p.type==="Question"?"Answer":"Comment"}</button>`}</footer>
+ </article>`;
+}
+function feedPosts(){
+ const ids=joinedIds();const q=ui.q.trim().toLowerCase();
+ let list=state.posts.filter(p=>postVisibleIn(p,ids));
+ if(ui.feed!=="all")list=list.filter(p=>p.targets?p.targets.includes(ui.feed):p.comm===ui.feed);
+ if(q)list=list.filter(p=>(p.body+" "+p.title+" "+p.author+" "+cbase(p.comm).name).toLowerCase().includes(q));
+ return list.sort((a,b)=>(b.pinned?1:0)-(a.pinned?1:0)||b.t-a.t);
+}
+function feedList(){
+ const q=ui.q.trim().toLowerCase();const list=feedPosts();
+ const cm=q?COMMS.filter(c=>(c.name+" "+c.area+" "+c.township).toLowerCase().includes(q)):[];
+ return(cm.length?`<p class="grp">${ic("users")}Communities</p>`+cm.map(c=>commRow(c.id)).join("")+`<p class="grp">${ic("book")}Posts</p>`:"")+(list.length?list.map(p=>postCard(p)).join(""):`<p class="empty">No posts match “${esc(ui.q)}”. Try another word, or ask the community with the + button.</p>`);
+}
+function commRow(id){
+ const c=comm(id);const on=!!state.joined[id];
+ return`<div class="card row tap" data-act="openComm" data-id="${id}"><span class="tic">${ic("users")}</span><div class="mid"><b>${esc(c.area)}</b><small>${esc(c.addr)}</small><small>${c.members} members</small></div><button class="joinbtn${on?" on":""}" data-act="join" data-id="${id}" aria-pressed="${on}">${on?ic("check")+"Joined":"Join"}</button></div>`;
+}
+function eventRow(e){
+ const c=cbase(e.comm);
+ return`<div class="card row tap" data-act="openEvent" data-id="${e.id}"><span class="tic">${ic("tent")}</span><div class="mid"><b>${esc(e.title)}</b><small>${esc(c.name)} · ${fmtDate(e.date,true)}, ${fmtTime(e.time)}</small><small>${e.going}/${e.cap} going${e.sponsor?" · Sponsored by SDP":""}</small><small style="color:#6E9C2A;font-weight:800">See more…</small></div><button class="joinbtn ${e.joined?"on":"dark"}" data-act="joinEvent" data-id="${e.id}" aria-pressed="${e.joined}" ${!e.joined&&e.going>=e.cap?"disabled":""}>${e.joined?ic("check")+"Joined":e.going>=e.cap?"Full":"JOIN"}</button></div>`;
+}
+
+/* ---------- screens ---------- */
+const S={};
+S.login=()=>`<div class="screen"><div class="scroll noNav">
+ <div class="welcome"><p class="welcome-t">Welcome</p><div class="logo-badge"><img src="lockup.webp" alt="Serumpun logo"></div></div>
+ <form class="auth-card" id="loginForm" novalidate>
+  <h1>Log in</h1>
+  <p class="sub">Sign in to continue. New user? <button type="button" class="link" data-act="go" data-s="register" data-replace="1">Create an account</button></p>
+  <div class="fld"><label for="lgName">Name</label><input id="lgName" class="pill-in" value="${esc(state.user.name)}" autocomplete="username"></div>
+  <div class="fld"><label for="lgPass">Password</label><input id="lgPass" type="password" class="pill-in" value="serumpun" autocomplete="current-password"></div>
+  <p class="err" id="lgErr"></p>
+  <button class="btn primary block" type="submit">Log in</button>
+  <button type="button" class="link center" data-act="forgot">Forgot password?</button>
+  <p class="or">or</p>
+  <button type="button" class="btn outline block" data-act="google">Continue with Google</button>
+ </form></div></div>`;
+S.register=()=>`<div class="screen"><div class="scroll noNav">
+ <div class="welcome" style="padding-bottom:84px"><p class="welcome-t">Join Serumpun</p><div class="logo-badge" style="width:120px;height:120px;border-radius:34px"><img src="lockup.webp" alt="Serumpun logo" style="width:94px"></div></div>
+ <form class="auth-card" id="regForm" novalidate>
+  <h1>Create new account</h1>
+  <p class="sub">Already registered? <button type="button" class="link" data-act="go" data-s="login" data-replace="1">Log in here</button></p>
+  <div class="fld"><label for="rgName">Name</label><input id="rgName" class="pill-in" placeholder="Jiara Martins" autocomplete="name"></div>
+  <div class="fld"><label for="rgEmail">Email</label><input id="rgEmail" type="email" class="pill-in" placeholder="hello@example.com" autocomplete="email"></div>
+  <div class="fld"><label for="rgPass">Password</label><input id="rgPass" type="password" class="pill-in" placeholder="At least 6 characters" autocomplete="new-password"></div>
+  <div class="fld"><label for="rgDob">Date of birth</label><input id="rgDob" type="date" class="pill-in" max="2014-12-31"></div>
+  <p class="err" id="rgErr"></p>
+  <button class="btn primary block" type="submit">Sign up</button>
+ </form></div></div>`;
+S.home=()=>{
+ const ids=joinedIds();const h=cbase(state.user.home);
+ return`<div class="screen"><div class="scroll">
+ <div class="hero"><div class="hello"><div><p>Hello, ${esc(state.user.name.split(" ")[0])}</p><b>${esc(h.name)} Greenhouse</b></div>${bell()}</div>
+  <label class="search" style="margin-top:16px"><span class="sr">Search posts and communities</span>${ic("search")}<input id="q" type="search" placeholder="Search posts, plants, communities" value="${esc(ui.q)}" autocomplete="off"></label>
+  <div class="tiles"><button class="tile" data-act="go" data-s="events"><span class="sq">${ic("cal")}</span><small>Events</small></button><button class="tile" data-act="go" data-s="newPost"><span class="sq">${ic("chat")}</span><small>Ask</small></button><button class="tile" data-act="go" data-s="communities"><span class="sq">${ic("pin")}</span><small>Communities</small></button></div>
+ </div>
+ <div class="sec"><div class="sec-h"><h2>Community feed</h2><button class="link" data-act="go" data-s="communities">Find more</button></div>
+  <div class="chips" role="group" aria-label="Filter feed"><button class="chip" data-act="feed" data-id="all" aria-pressed="${ui.feed==="all"}">All</button>${ids.map(i=>`<button class="chip" data-act="feed" data-id="${i}" aria-pressed="${ui.feed===i}">${esc(cbase(i).name)}</button>`).join("")}</div>
+  <div class="stack" id="results">${feedList()}</div></div>
+ </div></div>`;
+};
+S.communities=()=>{
+ const q=ui.q.trim().toLowerCase();
+ const list=COMMS.filter(c=>!q||(c.name+" "+c.area+" "+c.addr+" "+c.township).toLowerCase().includes(q));
+ const body=TOWNSHIPS.map(t=>{const cs=list.filter(c=>c.township===t);return cs.length?`<p class="grp">${ic("pin")}${esc(t)} · Sime Darby Property</p>`+cs.map(c=>commRow(c.id)).join(""):"";}).join("")||`<p class="empty">No community matches “${esc(ui.q)}”.</p>`;
+ return`<div class="screen">${bar(ui.onboard?"Pick your community":"Communities",{search:"Search by area or postcode",back:!ui.onboard})}<div class="scroll">
+ <div class="sec">${ui.onboard?`<p style="margin-bottom:12px;color:var(--ink-2)">Join the greenhouse community where you live. You can follow other communities too.</p>`:""}<div class="stack" id="results">${body}</div>
+ ${ui.onboard?`<div style="padding:18px 0"><button class="btn primary block" data-act="finishOnboard" ${joinedIds().length?"":"disabled"}>Continue</button></div>`:""}</div></div></div>`;
+};
+S.community=()=>{
+ const c=comm(ui.params.id);const on=!!state.joined[c.id];
+ const posts=state.posts.filter(p=>postVisibleIn(p,[c.id])).sort((a,b)=>b.t-a.t);
+ const evs=state.events.filter(e=>e.comm===c.id);const trs=state.trades.filter(t=>t.comm===c.id&&t.status==="open");
+ const tab=ui.commTab;
+ return`<div class="screen">${bar(c.name)}<div class="scroll"><div class="sec">
+ <div class="card" style="padding:16px;display:flex;flex-direction:column;gap:12px">
+  <div style="display:flex;gap:12px;align-items:center"><span class="tic" style="width:58px;height:58px;border-radius:18px;background:var(--lime-pale);display:grid;place-items:center">${ic("users")}</span><div style="min-width:0"><b style="font-size:18px;font-weight:800;display:block">${esc(c.area)}</b><small style="color:var(--ink-2)">${esc(c.addr)}</small></div></div>
+  <div style="display:flex;align-items:center;gap:10px"><b style="margin-right:auto">${c.members} members · ${c.mentors} mentors</b><button class="joinbtn${on?" on":""}" data-act="join" data-id="${c.id}" aria-pressed="${on}">${on?ic("check")+"Joined":"Join"}</button></div>
+  <small style="color:var(--ink-2)">Organiser: ${esc(c.organiser)} · ${esc(c.township)}</small>
+ </div>
+ <div class="seg" style="margin-top:14px" role="group" aria-label="Community sections"><button data-act="commTab" data-id="posts" aria-pressed="${tab==="posts"}">Posts (${posts.length})</button><button data-act="commTab" data-id="events" aria-pressed="${tab==="events"}">Events (${evs.length})</button><button data-act="commTab" data-id="trades" aria-pressed="${tab==="trades"}">Trades (${trs.length})</button></div>
+ <div class="stack">${tab==="posts"?(posts.map(p=>postCard(p)).join("")||`<p class="empty">No posts yet. Be the first to ask a question.</p>`):tab==="events"?(evs.map(eventRow).join("")||`<p class="empty">No events planned yet.</p>`):(trs.map(tradeRow).join("")||`<p class="empty">No open trades in this community.</p>`)}</div>
+ </div></div></div>`;
+};
+S.post=()=>{
+ const p=state.posts.find(x=>x.id===ui.params.id);if(!p)return S.home();
+ return`<div class="screen">${bar(p.type==="Question"?"Question":"Post")}<div class="scroll" style="padding-bottom:180px"><div class="sec stack">${postCard(p,true)}
+ <h2 style="font-size:16px;font-weight:800">${p.comments.length} ${p.comments.length===1?"reply":"replies"}</h2>
+ <div class="comments">${p.comments.map(c=>`<div class="cmt">${avatar(c.author,32,isMe(c.author)?state.user.avatar:null)}<div class="bub"><p class="n">${esc(c.author)}${c.mentor?'<span class="mentor">Mentor</span>':""} <span>· ${ago(c.t)}</span></p><p>${esc(c.text)}</p></div></div>`).join("")||`<p class="empty">No replies yet. Share what you know.</p>`}</div>
+ </div></div>
+ <form class="compose" id="cmtForm"><label class="sr" for="cmtIn">Write a reply</label><input id="cmtIn" class="pill-in" placeholder="${p.type==="Question"?"Write an answer…":"Write a comment…"}" autocomplete="off"><button class="sendbtn" type="submit" aria-label="Send reply">${ic("send")}</button></form></div>`;
+};
+S.notifications=()=>`<div class="screen">${bar("Notifications",{right:unread()?`<button class="iconbtn ghost" data-act="readAll" aria-label="Mark all as read">${ic("check")}</button>`:""})}<div class="scroll"><div class="sec stack">
+ ${state.notifs.map(n=>`<button class="card row" style="border:0;text-align:left;width:100%" data-act="openNotif" data-id="${n.id}"><span class="tic">${ic(n.icon)}</span><div class="mid"><b>${esc(n.title)}</b><small>${esc(n.body)}</small><small style="color:var(--ink-3)">${ago(n.t)}</small></div>${n.read?"":'<span class="unread" aria-label="Unread"></span>'}<span class="notif-go">${ic("go")}</span></button>`).join("")||`<p class="empty">You are all caught up.</p>`}
+ </div></div></div>`;
+function tradeRow(t){
+ const c=cbase(t.comm);const mine=t.mine;
+ let right="";
+ if(t.status==="open")right=`<button class="btn primary sm" data-act="tradeAsk" data-id="${t.id}">Trade</button>`;
+ else if(t.status==="mine")right=`<span class="status s-open">Your offer</span>`;
+ else if(t.status==="requested")right=`<span class="status s-req">Requested</span>`;
+ else if(t.status==="accepted")right=`<span class="status s-acc">Accepted</span>`;
+ else right=`<span class="status s-done">Done</span>`;
+ return`<div class="card row"><span class="tic">${ic("swap")}</span><div class="trade-mid"><p>${esc(t.give)}</p><p class="w">Trade with</p><p>${esc(t.want)}</p><small>${mine?"You":esc(t.by)} · ${esc(c.name)} · ${ago(t.t)}</small></div>${right}</div>`;
+}
+S.trade=()=>{
+ const q=ui.q.trim().toLowerCase();
+ const offers=state.trades.filter(t=>t.status==="open"&&(!q||(t.give+" "+t.want+" "+t.by).toLowerCase().includes(q)));
+ const mine=state.trades.filter(t=>t.mine||t.requestedByMe);
+ const myRow=t=>{
+  const c=cbase(t.comm);let st="",act="";
+  if(t.status==="mine"){st=`<span class="status s-open">Waiting for offers</span>`;act=`<button class="link" data-act="cancelTrade" data-id="${t.id}">Remove</button>`;}
+  if(t.status==="requested"){st=`<span class="status s-req">Waiting for ${esc(t.by.split(" ")[0])}</span>`;}
+  if(t.status==="accepted"){st=`<span class="status s-acc">Accepted</span>`;act=`<button class="btn lime sm" data-act="doneTrade" data-id="${t.id}">Mark as done</button>`;}
+  if(t.status==="done"){st=`<span class="status s-done">Completed</span>`;}
+  const youGive=t.mine?t.give:t.want,youGet=t.mine?t.want:t.give;
+  return`<div class="card" style="padding:14px;display:flex;flex-direction:column;gap:10px"><div class="swapbox"><div><span>You give</span><b>${esc(youGive)}</b></div>${ic("swap")}<div><span>You get</span><b>${esc(youGet)}</b></div></div><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">${st}<small style="color:var(--ink-2);margin-right:auto">${t.mine?"Your offer":"With "+esc(t.by)} · ${esc(c.name)}</small>${act}</div>${t.status==="accepted"?`<p class="callout" style="margin:0">${ic("pin")}Meet at ${esc(c.name)} Greenhouse gate, Saturday 9:00 AM</p>`:""}</div>`;
+ };
+ return`<div class="screen">${bar("Trade",{search:"Search plants, seeds, baja",back:false})}<div class="scroll" style="padding-bottom:170px"><div class="sec">
+ <div class="seg" role="group" aria-label="Trade lists"><button data-act="tradeTab" data-id="offers" aria-pressed="${ui.tradeTab==="offers"}">Offers (${state.trades.filter(t=>t.status==="open").length})</button><button data-act="tradeTab" data-id="mine" aria-pressed="${ui.tradeTab==="mine"}">My trades (${mine.length})</button></div>
+ <div class="stack" id="results">${ui.tradeTab==="offers"?(offers.map(tradeRow).join("")||`<p class="empty">No offers match. Post your own with Make trading.</p>`):(mine.map(myRow).join("")||`<p class="empty">No trades yet.</p>`)}</div>
+ </div></div><button class="btn primary fab" data-act="go" data-s="makeTrade">Make trading ${ic("plus")}</button></div>`;
+};
+function uploadBox(key,label){
+ const src=ui.draft[key];
+ return`<label class="upload" for="up_${key}"><input type="file" id="up_${key}" accept="image/*" data-upload="${key}">${src?`<img src="${src}" alt="Selected picture">`:`<span class="ph">${ic("img")}${label}</span>`}</label>`;
+}
+S.makeTrade=()=>`<div class="screen">${bar("Make trading")}<div class="scroll"><form class="form" id="tradeForm" novalidate>
+ <div class="fld"><label for="tfWant">What I want</label><input id="tfWant" class="pill-in" placeholder="Type here… e.g. Benih bendi" value="${esc(ui.draft.want||"")}"></div>
+ <div class="fld"><span class="lab">Picture (optional)</span>${uploadBox("pwant","Add a picture")}</div>
+ <div class="fld"><label for="tfGive">What I give</label><input id="tfGive" class="pill-in" placeholder="Type here… e.g. Keratan serai" value="${esc(ui.draft.give||"")}"></div>
+ <div class="fld"><span class="lab">Picture (optional)</span>${uploadBox("pgive","Add a picture")}</div>
+ <div class="fld"><label for="tfComm">Community</label><select id="tfComm" class="pill-in">${joinedIds().map(i=>`<option value="${i}" ${i===state.user.home?"selected":""}>${esc(cbase(i).name)}</option>`).join("")}</select></div>
+ <p class="err" id="tfErr"></p>
+ <div style="display:flex;justify-content:flex-end"><button class="btn primary" type="submit">Trade</button></div>
+ </form></div></div>`;
+S.events=()=>{
+ const list=ui.evTab==="joined"?state.events.filter(e=>e.joined):state.events.filter(e=>state.joined[e.comm]||e.joined||e.mine);
+ const others=ui.evTab==="upcoming"?state.events.filter(e=>!state.joined[e.comm]&&!e.joined&&!e.mine):[];
+ return`<div class="screen">${bar("Events",{back:true})}<div class="scroll"><div class="sec">
+ <div class="seg" role="group" aria-label="Event lists"><button data-act="evTab" data-id="upcoming" aria-pressed="${ui.evTab==="upcoming"}">Upcoming</button><button data-act="evTab" data-id="joined" aria-pressed="${ui.evTab==="joined"}">Joined (${state.events.filter(e=>e.joined).length})</button></div>
+ <div class="stack">${list.map(eventRow).join("")||`<p class="empty">${ui.evTab==="joined"?"You have not joined an event yet.":"No events in your communities yet."}</p>`}
+ ${others.length?`<p class="grp">${ic("net")}Other Serumpun communities</p>`+others.map(eventRow).join(""):""}
+ <button class="btn lime block" data-act="go" data-s="newEvent">${ic("plus")}Organise an event</button></div>
+ </div></div></div>`;
+};
+S.event=()=>{
+ const e=state.events.find(x=>x.id===ui.params.id);if(!e)return S.events();
+ const c=cbase(e.comm);const full=e.going>=e.cap&&!e.joined;
+ return`<div class="screen">${bar("Events")}<div class="scroll" style="padding-bottom:180px"><div class="sec stack">
+ <div style="display:flex;gap:12px;align-items:center"><span class="tic" style="width:52px;height:52px;border-radius:16px;background:var(--lime-pale);display:grid;place-items:center">${ic("tent")}</span><div><h2 style="font-size:21px;font-weight:800">${esc(e.title)}</h2><small style="font-weight:800;color:var(--ink-2);letter-spacing:.06em;text-transform:uppercase">${esc(c.name)} community</small></div></div>
+ <div class="ev-hero">${scene(e.scene)}</div>
+ ${e.sponsor?`<div class="sponsor">${ic("gift")}<span>Sponsored by Sime Darby Property: ${esc(e.sponsor)}</span></div>`:""}
+ <div class="card info"><div>${ic("cal")}${fmtDate(e.date).toUpperCase()}</div><div>${ic("clock")}${fmtTime(e.time)}</div><div style="grid-column:1/-1">${ic("pin")}${esc(e.place.toUpperCase())}</div><div class="cap"><div style="display:flex;gap:8px;align-items:center">${ic("user")}<span>${e.going}/${e.cap} going</span></div><div class="capbar"><i style="width:${Math.min(100,e.going/e.cap*100)}%"></i></div></div></div>
+ <p>${esc(e.desc)}</p><small style="color:var(--ink-2)">Organised by ${e.mine?"you":esc(e.organiser)}</small>
+ <h2 style="font-size:16px;font-weight:800;margin-top:4px">Help organise</h2>
+ <div class="card">${e.roles.map((r,i)=>{const left=r.need-r.filled;return`<div class="role"${i?' style="border-top:1px solid var(--line)"':""}><div class="mid"><b>${esc(r.name)}</b><small>${r.mine?"You are on this team":left>0?left+" more needed":"Team is full"}</small></div>${r.mine?`<button class="joinbtn on" data-act="role" data-id="${e.id}" data-i="${i}" aria-pressed="true">${ic("check")}Volunteering</button>`:`<button class="joinbtn" data-act="role" data-id="${e.id}" data-i="${i}" ${left>0?"":"disabled"}>${left>0?"Volunteer":"Full"}</button>`}</div>`;}).join("")}</div>
+ </div></div>
+ <div class="sticky-cta">${e.joined?`<button class="btn outline block" data-act="joinEvent" data-id="${e.id}">${ic("check")}You are going · Leave event</button>`:`<button class="btn primary block" data-act="joinEvent" data-id="${e.id}" ${full?"disabled":""}>${full?"Event is full":"JOIN NOW"}</button>`}</div></div>`;
+};
+S.newPost=()=>`<div class="screen">${bar("Ask or share")}<div class="scroll"><form class="form" id="postForm" novalidate>
+ <div class="fld"><label for="npComm">Post to</label><select id="npComm" class="pill-in">${joinedIds().map(i=>`<option value="${i}" ${i===state.user.home?"selected":""}>Community ${esc(cbase(i).name)}</option>`).join("")}</select></div>
+ <fieldset class="fld" style="border:0;padding:0;margin:0"><legend class="lab" style="margin-bottom:6px">Type</legend><div class="radios">${["Question","Tip","Tutorial"].map((t,i)=>`<label><input type="radio" name="npType" value="${t}" ${i===0?"checked":""}>${t}</label>`).join("")}</div></fieldset>
+ <div class="fld"><label for="npTitle">Title (optional)</label><input id="npTitle" class="pill-in" placeholder="e.g. Daun pokok limau kuning"></div>
+ <div class="fld"><label for="npBody">Your question or tip</label><textarea id="npBody" class="pill-in" placeholder="Describe what you see, or share what worked for you"></textarea></div>
+ <div class="fld"><span class="lab">Picture (optional)</span>${uploadBox("ppost","Add a picture of your plant")}</div>
+ <p class="err" id="npErr"></p>
+ <button class="btn primary block" type="submit">Post to community</button>
+ </form></div></div>`;
+S.newEvent=()=>`<div class="screen">${bar("Organise an event")}<div class="scroll"><form class="form" id="eventForm" novalidate>
+ <div class="fld"><label for="neTitle">Event name</label><input id="neTitle" class="pill-in" placeholder="e.g. Bengkel kompos"></div>
+ <div class="fld"><label for="neComm">Community</label><select id="neComm" class="pill-in">${joinedIds().map(i=>`<option value="${i}" ${i===state.user.home?"selected":""}>${esc(cbase(i).name)}</option>`).join("")}</select></div>
+ <div class="two"><div class="fld"><label for="neDate">Date</label><input id="neDate" type="date" class="pill-in" value="2026-11-29" min="2026-10-22"></div><div class="fld"><label for="neTime">Time</label><input id="neTime" type="time" class="pill-in" value="09:00"></div></div>
+ <div class="two"><div class="fld"><label for="nePlace">Place</label><input id="nePlace" class="pill-in" value="${esc(cbase(state.user.home).name)} Greenhouse"></div><div class="fld"><label for="neCap">Max people</label><input id="neCap" type="number" min="2" max="200" class="pill-in" value="20"></div></div>
+ <div class="fld"><label for="neDesc">What will happen</label><textarea id="neDesc" class="pill-in" placeholder="What people will do and what to bring"></textarea></div>
+ <fieldset class="fld" style="border:0;padding:0;margin:0"><legend class="lab" style="margin-bottom:6px">Committee roles you need</legend><div class="radios">${["Logistics","Refreshments","Registration desk","Photographer","Speaker"].map((r,i)=>`<label><input type="checkbox" name="neRole" value="${r}" ${i<2?"checked":""}>${r}</label>`).join("")}</div></fieldset>
+ <p class="err" id="neErr"></p>
+ <button class="btn primary block" type="submit">Create event</button>
+ </form></div></div>`;
+function stats(){
+ const me=state.user.name;
+ const myPosts=state.posts.filter(p=>p.mine).length;
+ const myCmts=state.posts.reduce((n,p)=>n+p.comments.filter(c=>c.mine).length,0);
+ const trades=state.trades.filter(t=>(t.mine&&t.id!=="t5")||t.requestedByMe).length;
+ const evs=state.events.filter(e=>e.joined).length;const roles=state.events.reduce((n,e)=>n+e.roles.filter(r=>r.mine).length,0);
+ const age=Math.floor((Date.now()-state.user.since)/(365*D));
+ return{posts:state.user.basePosts+myPosts,contrib:state.user.baseContrib+myPosts+myCmts+Math.max(0,trades)+evs+roles,age:age>=1?age+"y":Math.max(1,Math.floor((Date.now()-state.user.since)/(30*D)))+"m"};
+}
+S.profile=()=>{
+ const u=state.user;const s=stats();const ed=ui.editing;
+ const kv=(k,label,type)=>ed===k?`<form class="kv" id="editForm" data-k="${k}"><div class="mid"><label for="edIn"><span>${label}</span></label><input id="edIn" type="${type}" value="${esc(u[k])}"></div><button class="iconbtn" type="submit" aria-label="Save ${label}">${ic("check")}</button></form>`:`<div class="kv"><div class="mid"><span>${label}</span><p>${esc(u[k])}</p></div><button class="iconbtn" data-act="edit" data-id="${k}" aria-label="Edit ${label}">${ic("pencil")}</button></div>`;
+ return`<div class="screen">${bar("Profile",{back:false})}<div class="scroll"><div class="pf"><div class="pf-av">${avatar(u.name,112,u.avatar)}<input type="file" id="avIn" accept="image/*" data-upload="avatar"><label for="avIn" aria-label="Change profile photo">${ic("plus")}</label></div></div>
+ <div class="sec" style="padding-top:6px">${kv("name","Name","text")}${kv("email","Email","email")}
+ <div class="stats"><div><b>${s.posts}</b><small>posts</small></div><div><b>${s.contrib}</b><small>Contributions</small></div><div><b>${s.age}</b><small>Account age</small></div></div>
+ <p class="grp">${ic("users")}My communities</p><div class="chips" style="flex-wrap:wrap">${joinedIds().map(i=>`<button class="chip" data-act="openComm" data-id="${i}">${esc(cbase(i).name)}${i===u.home?" · Home":""}</button>`).join("")}<button class="chip" data-act="go" data-s="communities">+ Find more</button></div>
+ <div class="stack" style="margin-top:6px"><button class="btn lime block" data-act="toDash">${ic("dash")}Open Township Dashboard (SDP admin)</button><button class="btn outline block" data-act="logout">${ic("out")}Log out</button><button class="link center" data-act="resetDemo" style="margin-top:4px">Reset demo data</button></div></div>
+ </div></div>`;
+};
+
+/* ---------- nav + sheet ---------- */
+const AUTH=["login","register"];
+const GROUP={home:"home",post:"home",communities:"home",community:"home",notifications:"home",newPost:"home",events:"events",event:"events",newEvent:"events",trade:"trade",makeTrade:"trade",profile:"profile"};
+function navHTML(){
+ const g=GROUP[ui.screen];const b=(id,label,icon)=>`<button data-act="tab" data-s="${id}" ${g===id?'aria-current="page"':""}>${ic(icon)}${label}</button>`;
+ return`<nav class="nav" aria-label="Main">${b("home","Home","home")}${b("events","Events","tent")}<button class="plus" data-act="sheet" data-id="create" aria-label="Create"><span>${ic("plus")}</span></button>${b("trade","Trade","swap")}${b("profile","Profile","user")}</nav>`;
+}
+function sheetHTML(){
+ if(!ui.sheet)return"";
+ let inner="";
+ if(ui.sheet.type==="create")inner=`<h2>Create</h2>
+  <button class="opt" data-act="go" data-s="newPost"><span class="tic">${ic("chat")}</span><span><b>Ask or share</b><small>Ask a question or post a tip for your community</small></span></button>
+  <button class="opt" data-act="go" data-s="newEvent"><span class="tic">${ic("tent")}</span><span><b>Organise an event</b><small>Invite neighbours and find committee members</small></span></button>
+  <button class="opt" data-act="go" data-s="makeTrade"><span class="tic">${ic("swap")}</span><span><b>Make trading</b><small>Offer plants, seeds or baja in exchange</small></span></button>`;
+ if(ui.sheet.type==="trade"){const t=state.trades.find(x=>x.id===ui.sheet.id);const c=cbase(t.comm);
+  inner=`<h2>Trade with ${esc(t.by)}</h2><div class="swapbox"><div><span>You give</span><b>${esc(t.want)}</b></div>${ic("swap")}<div><span>You get</span><b>${esc(t.give)}</b></div></div><p class="callout" style="margin:0">${ic("pin")}You will meet face to face at ${esc(c.name)} Greenhouse gate. Pick a time together in chat after ${esc(t.by.split(" ")[0])} accepts.</p><button class="btn primary block" data-act="tradeSend" data-id="${t.id}">Send trade request</button><button class="btn outline block" data-act="closeSheet">Cancel</button>`;}
+ return`<div class="scrim" data-act="closeSheet"></div><div class="sheet" role="dialog" aria-modal="true" aria-label="${ui.sheet.type==="trade"?"Confirm trade":"Create"}"><span class="grab"></span>${inner}</div>`;
+}
+
+/* ---------- render ---------- */
+function renderApp(reset){
+ const root=$("#screenRoot");const sc=root.querySelector(".scroll");const top=(!reset&&sc)?sc.scrollTop:0;
+ if(!state.loggedIn&&!AUTH.includes(ui.screen))ui.screen="login";
+ const fn=S[ui.screen]||S.home;
+ root.innerHTML=fn()+(state.loggedIn&&!AUTH.includes(ui.screen)?navHTML():"")+sheetHTML();
+ const s2=root.querySelector(".scroll");if(s2)s2.scrollTop=top;
+ save();renderGuide();
+}
+function refreshResults(){
+ const r=$("#results");if(!r)return;
+ if(ui.screen==="home")r.innerHTML=feedList();
+ else{const keep=ui.q;renderApp(false);const q=$("#q");if(q){q.focus();q.setSelectionRange(keep.length,keep.length);}}
+}
+function go(screen,params={},replace=false){
+ if(!replace)ui.stack.push({screen:ui.screen,params:ui.params});
+ ui.screen=screen;ui.params=params;ui.sheet=null;ui.q="";ui.editing=null;ui.playing=null;
+ if(screen==="community")ui.commTab="posts";
+ if(screen==="makeTrade"||screen==="newPost")ui.draft={};
+ renderApp(true);
+}
+function back(){const p=ui.stack.pop();ui.sheet=null;ui.q="";ui.editing=null;ui.playing=null;if(p){ui.screen=p.screen;ui.params=p.params;}else ui.screen="home";renderApp(true);}
+function tab(s){ui.stack=[];ui.screen=s;ui.params={};ui.sheet=null;ui.q="";ui.editing=null;ui.playing=null;ui.onboard=false;renderApp(true);}
+let tt;
+function toast(msg){const t=$("#toast");t.innerHTML=ic("check")+`<span>${esc(msg)}</span>`;t.classList.add("show");clearTimeout(tt);tt=setTimeout(()=>t.classList.remove("show"),2600);}
+function notify(n){state.notifs.unshift({id:uid("n"),t:Date.now(),read:false,...n});}
+
+/* ---------- guide ---------- */
+const JUMPS=[["login","Login"],["register","Register"],["home","Main page"],["communities","Community search"],["community","One community",{id:"usj18"}],["notifications","Notifications"],["trade","Trade"],["makeTrade","Make trading"],["events","Events"],["event","Event detail",{id:"e1"}],["profile","Profile"]];
+function renderGuide(){
+ $("#jump").innerHTML=JUMPS.map(([s,l],i)=>`<button data-act="jump" data-i="${i}" ${ui.screen===s?'aria-current="true"':""}>${l}</button>`).join("");
+ $("#liveN").textContent=state.live.length;
+}
+
+/* ---------- app actions ---------- */
+function toggleJoin(id){
+ const on=!state.joined[id];const c=cbase(id);
+ if(on){state.joined[id]=true;state.memberAdj[id]=(state.memberAdj[id]||0)+1;logLive(`${state.user.name} joined ${c.name}`,id,"join");toast(`Joined ${c.name}. Its posts now show in your feed.`);}
+ else{if(joinedIds().length===1&&!ui.onboard){toast("Stay in at least one community.");return;}delete state.joined[id];state.memberAdj[id]=(state.memberAdj[id]||0)-1;if(ui.feed===id)ui.feed="all";toast(`Left ${c.name}`);}
+}
+function readFile(file,cb){if(!file)return;if(file.size>8e6){toast("Pick a picture under 8 MB.");return;}const r=new FileReader();r.onload=()=>{const img=new Image();img.onload=()=>{const k=Math.min(1,900/Math.max(img.width,img.height));const cv=document.createElement("canvas");cv.width=Math.round(img.width*k);cv.height=Math.round(img.height*k);cv.getContext("2d").drawImage(img,0,0,cv.width,cv.height);let out;try{out=cv.toDataURL("image/jpeg",.82);}catch(e){out=r.result;}cb(out);};img.onerror=()=>toast("That file is not a picture.");img.src=r.result;};r.readAsDataURL(file);}
+
+document.addEventListener("change",e=>{
+ const up=e.target.closest("[data-upload]");if(!up)return;
+ const key=up.dataset.upload;
+ readFile(up.files[0],src=>{
+  if(key==="avatar"){state.user.avatar=src;toast("Profile photo updated");renderApp(false);return;}
+  ui.draft[key]=src;
+  const form=up.closest("form");const keepWant=$("#tfWant")?.value,keepGive=$("#tfGive")?.value;
+  if(keepWant!==undefined){ui.draft.want=keepWant;ui.draft.give=keepGive;}
+  const box=up.closest(".upload");box.querySelector(".ph")?.remove();let im=box.querySelector("img");if(!im){im=document.createElement("img");im.alt="Selected picture";box.appendChild(im);}im.src=src;
+ });
+});
+document.addEventListener("input",e=>{
+ if(e.target.id==="q"){ui.q=e.target.value;if(ui.screen==="home")refreshResults();else{clearTimeout(window.__qt);window.__qt=setTimeout(refreshResults,180);}}
+});
+document.addEventListener("submit",e=>{
+ const f=e.target;if(!f.id)return;e.preventDefault();
+ if(f.id==="loginForm"){const n=$("#lgName").value.trim(),p=$("#lgPass").value;if(!n||!p){$("#lgErr").textContent="Enter your name and password to log in.";return;}state.user.name=n;state.loggedIn=true;ui.stack=[];ui.screen="home";renderApp(true);toast(`Welcome back, ${n.split(" ")[0]}`);}
+ if(f.id==="regForm"){const n=$("#rgName").value.trim(),em=$("#rgEmail").value.trim(),p=$("#rgPass").value,d=$("#rgDob").value;let err="";if(!n)err="Enter your name.";else if(!/^\S+@\S+\.\S+$/.test(em))err="Enter an email like name@example.com.";else if(p.length<6)err="Use a password with at least 6 characters.";else if(!d)err="Choose your date of birth.";if(err){$("#rgErr").textContent=err;return;}
+  state.user={...state.user,name:n,email:em,dob:d,since:Date.now(),basePosts:0,baseContrib:0,avatar:null};state.joined={};state.loggedIn=true;ui.onboard=true;ui.stack=[];ui.screen="communities";renderApp(true);logLive(`New resident ${n} signed up`,null,"signup");toast("Account created. Now pick your community.");}
+ if(f.id==="cmtForm"){const v=$("#cmtIn").value.trim();if(!v)return;const p=state.posts.find(x=>x.id===ui.params.id);p.comments.push({author:state.user.name,text:v,t:Date.now(),mine:true});logLive(`${state.user.name} ${p.type==="Question"?"answered":"commented on"} a post in ${cbase(p.comm).name}`,p.comm,"answer");renderApp(false);const s=$("#screenRoot .scroll");s.scrollTop=s.scrollHeight;toast(p.type==="Question"?"Answer posted":"Comment posted");}
+ if(f.id==="tradeForm"){const w=$("#tfWant").value.trim(),g=$("#tfGive").value.trim(),c=$("#tfComm").value;if(!w||!g){$("#tfErr").textContent="Fill in both what you want and what you give.";return;}state.trades.unshift({id:uid("t"),give:g,want:w,by:state.user.name,comm:c,t:Date.now(),status:"mine",mine:true,pgive:ui.draft.pgive||null,pwant:ui.draft.pwant||null});logLive(`${state.user.name} offered ${g} for ${w}`,c,"offer");ui.draft={};ui.tradeTab="mine";ui.stack.pop();ui.screen="trade";renderApp(true);toast("Trade offer posted to "+cbase(c).name);}
+ if(f.id==="postForm"){const c=$("#npComm").value,ty=(f.querySelector("input[name=npType]:checked")||{}).value||"Question",ti=$("#npTitle").value.trim(),b=$("#npBody").value.trim();if(!b){$("#npErr").textContent="Write your question or tip first.";return;}const p={id:uid("p"),author:state.user.name,comm:c,t:Date.now(),type:ty,title:ti,body:b,media:ui.draft.ppost?{kind:"photo",src:ui.draft.ppost}:null,likes:0,liked:false,comments:[],mine:true};state.posts.unshift(p);logLive(`${state.user.name} posted a ${ty.toLowerCase()} in ${cbase(c).name}`,c,"post");ui.draft={};ui.feed="all";ui.stack=[];ui.screen="home";renderApp(true);toast("Posted to "+cbase(c).name);
+  if(ty==="Question")setTimeout(()=>{const q=state.posts.find(x=>x.id===p.id);if(!q)return;q.comments.push({author:"Mak Som",mentor:true,text:"Boleh share gambar dari dekat? Saya rasa boleh bantu.",t:Date.now()});notify({icon:"chat",title:"Mak Som answered your question",body:b.slice(0,60),link:["post",p.id]});renderApp(false);},6000);}
+ if(f.id==="eventForm"){const t=$("#neTitle").value.trim(),c=$("#neComm").value,d=$("#neDate").value,tm=$("#neTime").value,pl=$("#nePlace").value.trim(),cap=Math.max(2,parseInt($("#neCap").value,10)||20),ds=$("#neDesc").value.trim();if(!t||!d||!tm||!pl){$("#neErr").textContent="Fill in the event name, date, time and place.";return;}const roles=[...f.querySelectorAll("input[name=neRole]:checked")].map(i=>({name:i.value,need:2,filled:0,mine:false}));const ev={id:uid("e"),title:t,comm:c,date:d,time:tm,place:pl,going:1,cap,joined:true,mine:true,scene:"greenhouse",organiser:state.user.name,sponsor:null,desc:ds||"Details to follow.",roles};state.events.push(ev);state.events.sort((a,b)=>a.date.localeCompare(b.date));logLive(`${state.user.name} created the event “${t}” in ${cbase(c).name}`,c,"event");ui.stack=[];ui.screen="events";go("event",{id:ev.id});toast("Event created. Neighbours in "+cbase(c).name+" can now join.");}
+ if(f.id==="editForm"){const k=f.dataset.k,v=$("#edIn").value.trim();if(!v)return;if(k==="email"&&!/^\S+@\S+\.\S+$/.test(v)){toast("Enter a valid email.");return;}const old=state.user.name;state.user[k]=v;if(k==="name"){state.posts.forEach(p=>{if(p.author===old)p.author=v;p.comments.forEach(c=>{if(c.author===old)c.author=v;});});state.trades.forEach(t=>{if(t.by===old)t.by=v;});}ui.editing=null;renderApp(false);toast(k==="name"?"Name updated":"Email updated");}
+});
+
+document.addEventListener("click",e=>{
+ const v=e.target.closest("[data-view]");if(v){setView(v.dataset.view);return;}
+ const el=e.target.closest("[data-act]");if(!el)return;
+ if(el.closest("#dash")||el.closest("#modalRoot"))return dashClick(el,e);
+ const a=el.dataset.act,id=el.dataset.id;
+ if(el.tagName==="BUTTON"&&el.closest(".row.tap")&&a!=="openComm"&&a!=="openEvent")e.stopPropagation();
+ switch(a){
+ case"go":if(el.dataset.s==="newPost"||el.dataset.s==="newEvent"||el.dataset.s==="makeTrade"){ui.sheet=null;}go(el.dataset.s,{},!!el.dataset.replace);break;
+ case"back":back();break;
+ case"tab":tab(el.dataset.s);break;
+ case"jump":{const[s,,p]=JUMPS[+el.dataset.i];if(!AUTH.includes(s))state.loggedIn=true;else state.loggedIn=false;ui.stack=[];ui.onboard=false;if(["community","event","notifications","communities","makeTrade"].includes(s)){ui.screen=GROUP[s]==="home"?"home":GROUP[s];ui.stack=[];go(s,p||{});}else{ui.screen=s;ui.params=p||{};ui.q="";ui.sheet=null;renderApp(true);}break;}
+ case"forgot":toast("Reset link sent to your email");break;
+ case"google":state.loggedIn=true;ui.stack=[];ui.screen="home";renderApp(true);toast("Signed in with Google");break;
+ case"feed":ui.feed=id;renderApp(false);break;
+ case"expand":ui.expanded[id]=true;renderApp(false);break;
+ case"like":{const p=state.posts.find(x=>x.id===id);p.liked=!p.liked;p.likes+=p.liked?1:-1;if(p.liked)logLive(`${state.user.name} liked a post in ${cbase(p.comm).name}`,p.comm,"like");renderApp(false);break;}
+ case"openPost":if(ui.screen!=="post"||ui.params.id!==id)go("post",{id});else $("#cmtIn")?.focus();break;
+ case"play":ui.playing=ui.playing===id?null:id;renderApp(false);break;
+ case"openComm":if(e.target.closest(".joinbtn"))break;go("community",{id});break;
+ case"join":e.stopPropagation();toggleJoin(id);renderApp(false);break;
+ case"finishOnboard":{const first=joinedIds()[0];state.user.home=first;ui.onboard=false;ui.stack=[];ui.screen="home";renderApp(true);toast("You're in! Here is your community feed.");break;}
+ case"commTab":ui.commTab=id;renderApp(false);break;
+ case"openNotif":{const n=state.notifs.find(x=>x.id===id);n.read=true;const[s,pid]=n.link||["home"];if(s==="trade"){ui.tradeTab="offers";go("trade");}else go(s,pid?{id:pid}:{});break;}
+ case"readAll":state.notifs.forEach(n=>n.read=true);renderApp(false);toast("All notifications marked as read");break;
+ case"tradeTab":ui.tradeTab=id;renderApp(false);break;
+ case"tradeAsk":ui.sheet={type:"trade",id};renderApp(false);break;
+ case"tradeSend":{const t=state.trades.find(x=>x.id===id);t.status="requested";t.requestedByMe=true;t.t=Date.now();ui.sheet=null;logLive(`${state.user.name} asked ${t.by} to trade ${t.want} for ${t.give}`,t.comm,"tradeReq");ui.tradeTab="mine";renderApp(false);toast(`Request sent to ${t.by.split(" ")[0]}`);
+  setTimeout(()=>{if(t.status!=="requested")return;t.status="accepted";notify({icon:"swap",title:"Trade accepted",body:`${t.by} accepted: ${t.give} for your ${t.want}`,link:["trade"]});logLive(`${t.by} accepted a trade with ${state.user.name}`,t.comm,"tradeAcc");renderApp(false);toast(`${t.by.split(" ")[0]} accepted your trade`);},3500);break;}
+ case"doneTrade":{const t=state.trades.find(x=>x.id===id);t.status="done";t.doneAt=Date.now();logLive(`Trade completed in ${cbase(t.comm).name}: ${t.give} ⇄ ${t.want}`,t.comm,"tradeDone");renderApp(false);toast("Trade completed. Nice to meet a neighbour!");break;}
+ case"cancelTrade":state.trades=state.trades.filter(x=>x.id!==id);renderApp(false);toast("Offer removed");break;
+ case"evTab":ui.evTab=id;renderApp(false);break;
+ case"openEvent":if(e.target.closest(".joinbtn"))break;go("event",{id});break;
+ case"joinEvent":{e.stopPropagation();const ev=state.events.find(x=>x.id===id);if(ev.joined){ev.joined=false;ev.going--;ev.roles.forEach(r=>{if(r.mine){r.mine=false;r.filled--;}});toast("You left "+ev.title);}else{if(ev.going>=ev.cap)return;ev.joined=true;ev.going++;logLive(`${state.user.name} joined “${ev.title}” in ${cbase(ev.comm).name}`,ev.comm,"eventJoin");toast(`You're going to ${ev.title} on ${fmtDate(ev.date,true)}`);notify({icon:"cal",title:"Event reminder set",body:`${ev.title}, ${fmtDate(ev.date)} at ${fmtTime(ev.time)}`,link:["event",ev.id]});}renderApp(false);break;}
+ case"role":{const ev=state.events.find(x=>x.id===id);const r=ev.roles[+el.dataset.i];if(r.mine){r.mine=false;r.filled--;toast("You left the "+r.name+" team");}else{if(r.filled>=r.need)return;r.mine=true;r.filled++;if(!ev.joined){ev.joined=true;ev.going++;}logLive(`${state.user.name} volunteered for ${r.name} at “${ev.title}”`,ev.comm,"volunteer");toast(`Thanks! You're on the ${r.name} team`);}renderApp(false);break;}
+ case"sheet":ui.sheet={type:id};renderApp(false);break;
+ case"closeSheet":ui.sheet=null;renderApp(false);break;
+ case"edit":ui.editing=id;renderApp(false);$("#edIn")?.focus();break;
+ case"toDash":setView("dashboard");break;
+ case"resetDemo":resetDemo();break;
+ case"logout":state.loggedIn=false;ui.stack=[];ui.screen="login";renderApp(true);toast("Logged out");break;
+ }
+});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){if(dash.modal){dash.modal=null;renderModal();}else if(ui.sheet){ui.sheet=null;renderApp(false);}}});
+
+/* =================== TOWNSHIP DASHBOARD =================== */
+function rng(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+const WEEKS=24;
+const SERIES=(()=>{const out={};COMMS.forEach((c,ci)=>{const r=rng(97+ci*13);const arr=[];for(let i=0;i<WEEKS;i++){const f=Math.max(0,c.level*(1+c.trend*(i-12)/12)*(.8+.4*r()));const ev=(i%4===ci%4)&&r()<.45+.5*c.level;arr.push({posts:Math.round(c.members*.3*f),trades:Math.round(c.members*.2*f),events:ev?1:0,att:ev?Math.round(c.members*(.35+.4*Math.min(f,1.2))*(.85+.3*r())):0,conn:Math.round(c.members*.09*f+(ev?3*f:0)),active:Math.min(c.members,Math.round(c.members*(.2+.55*Math.min(f,1.3))))});}out[c.id]=arr;});return out;})();
+const RETAIN={"Subang Jaya (USJ)":[78,41],"City of Elmina":[82,45],"Bandar Bukit Raja":[60,33]};
+const SURVEY={"Subang Jaya (USJ)":[2.6,4.1,34,71],"City of Elmina":[2.5,4.2,31,74],"Bandar Bukit Raja":[2.4,3.0,28,40]};
+const TOPICS=[["Pests and plant disease",34],["Composting and baja",27],["Fruit trees",19],["Herbs and ulam",15],["Watering and soil",12]];
+const LINKS=[["usj18","elmgar",23],["usj16","usj18",17],["elmwest","elmgar",12],["usj13","usj16",8],["bkraja","elmgar",3]];
+const PAST=[{title:"Seedling swap day",comm:"usj18",w:21,att:38},{title:"Bengkel kompos",comm:"elmgar",w:19,att:41},{title:"Greenhouse open day",comm:"usj16",w:20,att:17},{title:"Hydroponik botol",comm:"elmwest",w:22,att:11},{title:"Harvest potluck",comm:"usj18",w:23,att:29},{title:"Pruning class",comm:"usj13",w:17,att:9}];
+const SEEDFEED=[{ic:"check",cls:"ok",text:"USJ 18: harvest potluck, 29 attended",w:1},{ic:"check",cls:"ok",text:"Elmina Gardens: 12 chilli seedlings traded",w:1},{ic:"warn",cls:"wa",text:"Bukit Raja 2: no trades in the last 6 weeks",w:0},{ic:"check",cls:"ok",text:"USJ 16: 4 new mentor pairs started",w:2},{ic:"warn",cls:"wa",text:"USJ 13: activity down for 4 weeks in a row",w:0}];
+function weekLabel(i){const d=new Date(Date.now()-(WEEKS-1-i)*7*D);return`${d.getDate()} ${MON[d.getMonth()].slice(0,3)}`;}
+function scopeComms(){return dash.township==="all"?COMMS:COMMS.filter(c=>c.township===dash.township);}
+function liveFor(ids){
+ const m={posts:0,trades:0,att:0,conn:0,answers:0,signups:0};
+ state.posts.forEach(p=>{if(p.mine&&ids.includes(p.comm))m.posts++;p.comments.forEach(c=>{if(c.mine&&ids.includes(p.comm)){m.posts++;m.answers++;}});});
+ state.trades.forEach(t=>{if(t.status==="done"&&(t.mine||t.requestedByMe)&&ids.includes(t.comm)){m.trades++;m.conn++;}});
+ state.events.forEach(ev=>{if(ids.includes(ev.comm))m.signups+=ev.going;});
+ return m;
+}
+function agg(ids,from,to,withLive){
+ const t={posts:0,trades:0,events:0,att:0,conn:0,active:0};
+ for(let i=from;i<to;i++){let act=0;ids.forEach(id=>{const s=SERIES[id][i];t.posts+=s.posts;t.trades+=s.trades;t.events+=s.events;t.att+=s.att;t.conn+=s.conn;act+=s.active;});t.active+=act;}
+ t.active=Math.round(t.active/(to-from));
+ if(withLive){const l=liveFor(ids);t.posts+=l.posts;t.trades+=l.trades;t.conn+=l.conn;}
+ return t;
+}
+function commScore(id,w){let s=0,zeroRun=0,stop=false;for(let i=WEEKS-w;i<WEEKS;i++){const x=SERIES[id][i];s+=x.posts+x.trades+x.att*.5;}for(let i=WEEKS-1;i>=0&&!stop;i--){if(SERIES[id][i].trades===0)zeroRun++;else stop=true;}
+ const l=liveFor([id]);s+=l.posts+l.trades;const c=comm(id);const per=s/(c.members*w);
+ const prev=(()=>{let p=0;for(let i=WEEKS-2*w;i<WEEKS-w;i++){const x=SERIES[id][Math.max(0,i)];p+=x.posts+x.trades+x.att*.5;}return p;})();
+ const hl=per>=.42?"good":per>=.2?"warn":"bad";
+ return{score:Math.round(s/w),per,health:hl,zeroRun:l.trades?0:zeroRun,change:prev?Math.round((s-prev)/prev*100):0};
+}
+const HL={good:["h-good","Thriving"],warn:["h-warn","Slowing"],bad:["h-bad","Needs support"]};
+function pct(a,b){if(!b)return 0;return Math.round((a-b)/b*100);}
+function deltaChip(d){const cls=d>2?"up":d<-2?"down":"flat";return`<span class="delta ${cls}">${d>2?ic("up"):d<-2?ic("down"):""}${d>0?"+":""}${d}% vs previous</span>`;}
+function niceMax(v){const steps=[5,10,20,25,50,100,200,250,500,1000];for(const s of steps){if(v<=s)return s;}return Math.ceil(v/500)*500;}
+function lineChart(labels,series){
+ const W=640,Hh=250,pl=38,pr=26,pt=14,pb=30;const max=niceMax(Math.max(4,...series.flatMap(s=>s.vals)));
+ const n=labels.length;const x=i=>pl+(n===1?0:i*(W-pl-pr)/(n-1));const y=v=>pt+(Hh-pt-pb)*(1-v/max);
+ const steps=max%4===0?4:5;
+ let g="";for(let k=0;k<=steps;k++){const v=max*k/steps;g+=`<line x1="${pl}" x2="${W-pr}" y1="${y(v)}" y2="${y(v)}" stroke="#E6ECE4" stroke-width="1"/><text x="${pl-8}" y="${y(v)+4}" text-anchor="end">${Math.round(v)}</text>`;}
+ const every=Math.ceil(n/8);labels.forEach((l,i)=>{if(i%every===0||i===n-1)g+=`<text x="${x(i)}" y="${Hh-8}" text-anchor="${i===n-1?"end":i===0?"start":"middle"}">${l}</text>`;});
+ series.forEach((s,si)=>{const pts=s.vals.map((v,i)=>`${x(i).toFixed(1)},${y(v).toFixed(1)}`);if(si===0)g+=`<path d="M${pts[0]} L${pts.join(" L")} L${x(n-1)},${y(0)} L${x(0)},${y(0)}Z" fill="${s.color}" opacity=".12"/>`;g+=`<polyline points="${pts.join(" ")}" fill="none" stroke="${s.color}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>`;const lv=s.vals[n-1];g+=`<circle cx="${x(n-1)}" cy="${y(lv)}" r="5" fill="#fff" stroke="${s.color}" stroke-width="3"/>`;});
+ return`<svg class="chart" viewBox="0 0 ${W} ${Hh}" role="img" aria-label="Weekly activity chart: ${series.map(s=>s.name+" latest "+s.vals[n-1]).join(", ")}">${g}</svg>`;
+}
+function renderDash(){
+ const cs=scopeComms();const ids=cs.map(c=>c.id);const w=dash.weeks;
+ const cur=agg(ids,WEEKS-w,WEEKS,true),prev=agg(ids,WEEKS-2*w,WEEKS-w,false);
+ const joinedMembers=cs.reduce((n,c)=>n+comm(c.id).members,0);
+ const mentors=cs.reduce((n,c)=>n+c.mentors,0);
+ const live=state.live.filter(l=>!l.comm||ids.includes(l.comm));
+ const scopeName=dash.township==="all"?"All townships":dash.township;
+ const head=`<section class="dhead"><div class="dhead-row"><div class="dtitle"><h1>Township Dashboard</h1><p>Sime Darby Property admin view · ${esc(scopeName)} · aggregated data only, no personal details</p><span class="livepill"><i></i>${state.live.length} live action${state.live.length===1?"":"s"} from the resident app included</span></div>
+ <div class="filters"><label for="fTown">Township<select id="fTown"><option value="all">All townships</option>${TOWNSHIPS.map(t=>`<option ${dash.township===t?"selected":""}>${esc(t)}</option>`).join("")}</select></label><label for="fWeeks">Period<select id="fWeeks">${[4,8,12].map(n=>`<option value="${n}" ${dash.weeks===n?"selected":""}>Last ${n} weeks</option>`).join("")}</select></label></div></div></section>
+ <div class="dtabs" role="group" aria-label="Dashboard sections">${[["overview","Overview"],["communities","Communities"],["events","Events"],["announce","Announcements"]].map(([k,l])=>`<button data-act="dtab" data-id="${k}" aria-pressed="${dash.tab===k}">${l}</button>`).join("")}</div>`;
+ let body="";
+ if(dash.tab==="overview"){
+  const kpi=(icon,k,v,s,d)=>`<div class="kpi"><p class="k"><span class="i">${ic(icon)}</span>${k}</p><p class="v">${v}</p><p class="s">${s}</p>${d!==null?deltaChip(d):""}</div>`;
+  const answered=Math.min(97,80+Math.round(cs.reduce((n,c)=>n+c.level,0)/cs.length*12));
+  const kpis=`<div class="kpis">${kpi("users","Active members",cur.active,`of ${joinedMembers} joined`,pct(cur.active,prev.active))}${kpi("book","Posts and answers",cur.posts,`${answered}% of questions answered`,pct(cur.posts,prev.posts))}${kpi("swap","Trades completed",cur.trades,`about ${Math.round(cur.trades*1.8)} kg plants and baja reused`,pct(cur.trades,prev.trades))}${kpi("sprout","Mentor pairs",mentors,"beginner + mentor",null)}${kpi("tent","Events held",cur.events,`${cur.att} attendees`,pct(cur.att,prev.att))}${kpi("link","New neighbour links",cur.conn,"first meetups via trades and events",pct(cur.conn,prev.conn))}</div>`;
+  const labels=[],sp=[],st=[],sa=[];for(let i=WEEKS-w;i<WEEKS;i++){labels.push(weekLabel(i));let a=0,b=0,c=0;ids.forEach(id=>{const s=SERIES[id][i];a+=s.posts;b+=s.trades;c+=s.att;});sp.push(a);st.push(b);sa.push(c);}
+  const l=liveFor(ids);sp[sp.length-1]+=l.posts;st[st.length-1]+=l.trades;
+  const chart=`<div class="panel"><div class="ph-row"><h2>Weekly activity</h2><span class="hint">Week starting</span></div><div class="legend"><span><i style="background:#185C50"></i>Posts and answers</span><span><i style="background:#8DBE3A"></i>Trades</span><span><i style="background:#D99A2B"></i>Event attendance</span></div>${lineChart(labels,[{name:"Posts and answers",color:"#185C50",vals:sp},{name:"Trades",color:"#8DBE3A",vals:st},{name:"Event attendance",color:"#D99A2B",vals:sa}])}</div>`;
+  const rows=cs.map(c=>({c,...commScore(c.id,w)})).sort((a,b)=>b.score-a.score);const mx=Math.max(1,...rows.map(r=>r.score));
+  const colorOf=h=>h==="good"?"#2C8A4B":h==="warn"?"#E3A21A":"#D2574C";
+  const byComm=`<div class="panel"><div class="ph-row"><h2>Activity by community</h2><span class="hint">Tap a row for details</span></div><div class="bars">${rows.map(r=>`<button class="brow" data-act="commInfo" data-id="${r.c.id}"><span class="nm">${esc(r.c.name)}</span><span class="track"><i style="width:${Math.max(3,r.score/mx*100)}%;background:${colorOf(r.health)}"></i></span><span class="n">${r.score}</span><span class="health ${HL[r.health][0]}">${HL[r.health][1]}</span></button>`).join("")}</div><p class="note">Posts, trades and event attendance per week. Amber or red means the community needs support.</p></div>`;
+  const tw=dash.township==="all"?null:dash.township;
+  const ret=tw?RETAIN[tw]:[Math.round((78*74+82*56+60*11)/141),Math.round((41*74+45*56+33*11)/141)];
+  const sv=tw?SURVEY[tw]:[2.5,4.1,32,70];
+  const retain=`<div class="panel"><h2>Beginners still gardening after 30 days</h2><div class="cmp"><div class="r"><span>With a mentor</span><span class="track"><i style="width:${ret[0]}%;background:#185C50"></i></span><b>${ret[0]}%</b></div><div class="r"><span>No mentor</span><span class="track"><i style="width:${ret[1]}%;background:#B8C4C2"></i></span><b>${ret[1]}%</b></div></div>
+   <h2 style="margin-top:4px">Resident survey</h2><div class="big2"><div><small>Feel connected to neighbours (1 to 5)</small><b>${sv[0]} <em>→</em> ${sv[1]}</b><small>before → after joining</small></div><div><small>Know 3+ neighbours by name</small><b>${sv[2]}% <em>→</em> ${sv[3]}%</b><small>before → after joining</small></div></div></div>`;
+  const scale=cs.reduce((n,c)=>n+c.members,0)/141*w/8;
+  const tps=TOPICS.map(([t,n])=>[t,Math.max(1,Math.round(n*scale))]);const tmx=Math.max(...tps.map(x=>x[1]));
+  const topics=`<div class="panel"><h2>What residents are learning</h2><div class="topics">${tps.map(([t,n])=>`<div class="topic"><span>${t}</span><span class="track"><i style="width:${n/tmx*100}%"></i></span><b>${n}</b></div>`).join("")}</div><p class="callout">${ic("leaf")}Most questions are about pests. A sponsored pest-control workshop would reach the most residents.</p></div>`;
+  const lk=LINKS.filter(([a,b])=>ids.includes(a)||ids.includes(b));
+  const follow=Math.round(cs.reduce((n,c)=>n+c.level,0)/cs.length*40);
+  const network=`<div class="panel"><h2>Connected communities</h2><div class="big2"><div><small>Members following another community</small><b>${follow}%</b></div><div><small>Trades across communities</small><b>${Math.round(cur.trades*.18)}</b></div></div><div class="netlist">${lk.map(([a,b,n])=>`<div>${ic("net")}${esc(cbase(a).name)} ↔ ${esc(cbase(b).name)}<b>${n} follows</b></div>`).join("")||'<p class="note">No cross-community links yet.</p>'}</div></div>`;
+  const att=rows.filter(r=>r.health!=="good");
+  const needs=`<div class="panel"><h2>Needs attention</h2><ul class="feedlist">${att.map(r=>`<li>${ic("warn","wa")}<span>${esc(r.c.name)}: ${r.zeroRun>=2?`no trades in ${r.zeroRun} weeks`:r.change<0?`activity down ${Math.abs(r.change)}% vs previous period`:"low activity per member"}<small>${r.c.members} members · organiser ${esc(r.c.organiser)}</small></span></li>`).join("")||`<li>${ic("check","ok")}<span>Every community in this view is thriving.</span></li>`}</ul>${att.length?`<button class="act" data-act="dmodal" data-id="space">${ic("gh")}<span>Offer greenhouse space or support<small>Send help to the communities above</small></span></button>`:""}</div>`;
+  const feedItems=[...live.slice(0,5).map(x=>`<li>${ic("sprout","lv")}<span>${esc(x.text)}<small>${ago(x.t)} · from the resident app</small></span></li>`),...SEEDFEED.filter(f=>dash.township==="all"||ids.some(i=>f.text.startsWith(cbase(i).name))).map(f=>`<li>${ic(f.ic,f.cls)}<span>${esc(f.text)}<small>${f.w?f.w+"w ago":"this week"}</small></span></li>`)].slice(0,7);
+  const recent=`<div class="panel"><h2>Recent community activity</h2><ul class="feedlist">${feedItems.join("")}</ul></div>`;
+  const actions=`<div class="panel"><h2>SDP actions</h2><div class="actions"><button class="act" data-act="dmodal" data-id="announce">${ic("mega")}<span>Post announcement<small>Send to residents' feed</small></span></button><button class="act" data-act="dmodal" data-id="sponsor">${ic("gift")}<span>Sponsor event<small>Support an upcoming event</small></span></button><button class="act" data-act="dmodal" data-id="space">${ic("gh")}<span>Offer greenhouse space<small>Free plots or facilities</small></span></button><button class="act" data-act="dmodal" data-id="export">${ic("report")}<span>Export report<small>Summary for this view</small></span></button></div></div>`;
+  body=kpis+`<div class="dgrid">${chart}${byComm}</div><div class="dgrid three">${retain}${topics}${network}</div><div class="dgrid three">${needs}${recent}${actions}</div>`;
+ }
+ if(dash.tab==="communities"){
+  body=`<div class="panel"><div class="ph-row"><h2>Communities</h2><span class="hint">${esc(scopeName)} · last ${w} weeks</span></div><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Community</th><th>Township</th><th class="num">Members</th><th class="num">Active / wk</th><th class="num">Posts</th><th class="num">Trades</th><th class="num">Events</th><th class="num">Mentors</th><th>Health</th><th></th></tr></thead><tbody>${cs.map(c=>{const a=agg([c.id],WEEKS-w,WEEKS,true);const h=commScore(c.id,w).health;return`<tr><td><b>${esc(c.name)}</b><br><small style="color:var(--ink-3)">${esc(c.organiser)}</small></td><td>${esc(c.township)}</td><td class="num">${comm(c.id).members}</td><td class="num">${a.active}</td><td class="num">${a.posts}</td><td class="num">${a.trades}</td><td class="num">${a.events}</td><td class="num">${c.mentors}</td><td><span class="health ${HL[h][0]}">${HL[h][1]}</span></td><td><button class="btn outline sm" data-act="commInfo" data-id="${c.id}">View</button></td></tr>`;}).join("")}</tbody></table></div></div>`;
+ }
+ if(dash.tab==="events"){
+  const up=state.events.filter(e=>ids.includes(e.comm));const past=PAST.filter(p=>ids.includes(p.comm)&&p.w>=WEEKS-w);
+  body=`<div class="panel"><div class="ph-row"><h2>Upcoming events</h2><span class="hint">Live sign-ups from the app</span></div><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Event</th><th>Community</th><th>Date</th><th class="num">Signed up</th><th>Committee</th><th>Support</th><th></th></tr></thead><tbody>${up.map(e=>{const rf=e.roles.reduce((n,r)=>n+r.filled,0),rn=e.roles.reduce((n,r)=>n+r.need,0);return`<tr><td><b>${esc(e.title)}</b></td><td>${esc(cbase(e.comm).name)}</td><td>${fmtDate(e.date)}, ${fmtTime(e.time)}</td><td class="num">${e.going}/${e.cap}</td><td>${rf}/${rn} roles filled</td><td>${e.sponsor?`<span class="health h-good">${esc(e.sponsor)}</span>`:'<span class="note">None</span>'}</td><td>${e.sponsor?"":`<button class="btn lime sm" data-act="dmodal" data-id="sponsor" data-ev="${e.id}">Sponsor</button>`}</td></tr>`;}).join("")}</tbody></table></div></div>
+  <div class="panel"><div class="ph-row"><h2>Past events</h2><span class="hint">Last ${w} weeks</span></div><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Event</th><th>Community</th><th>Week of</th><th class="num">Attended</th></tr></thead><tbody>${past.map(p=>`<tr><td><b>${esc(p.title)}</b></td><td>${esc(cbase(p.comm).name)}</td><td>${weekLabel(p.w)}</td><td class="num">${p.att}</td></tr>`).join("")||`<tr><td colspan="4" class="note">No events in this period.</td></tr>`}</tbody></table></div></div>`;
+ }
+ if(dash.tab==="announce"){
+  body=`<div class="dgrid"><div class="panel"><h2>Post an announcement</h2><p class="note">It appears at the top of residents' feeds and as a notification in the app.</p><button class="btn primary" data-act="dmodal" data-id="announce" style="align-self:flex-start">${ic("mega")}New announcement</button></div>
+  <div class="panel"><h2>Sent</h2>${state.announcements.length?state.announcements.map(a=>`<div class="ann"><b>${esc(a.title)}</b><p>${esc(a.msg)}</p><small>${esc(targetLabel(a.targets))} · ${ago(a.t)}</small></div>`).join(""):'<p class="note">Nothing sent yet. Your first announcement will show here and in the resident app.</p>'}</div></div>`;
+ }
+ $("#dash").innerHTML=head+body+`<p class="note">Sample data for the prototype. Actions taken in the resident app are added live. Personal data is never shown in this view.</p>`;
+}
+function targetsFrom(v){if(v==="all")return COMMS.map(c=>c.id);if(v.startsWith("t:"))return COMMS.filter(c=>c.township===v.slice(2)).map(c=>c.id);return[v];}
+function targetSelect(id){return`<select id="${id}" class="pill-in"><option value="all">All Serumpun communities</option>${TOWNSHIPS.map(t=>`<option value="t:${esc(t)}">${esc(t)} (township)</option>`).join("")}${COMMS.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join("")}</select>`;}
+function reportText(){
+ const cs=scopeComms(),ids=cs.map(c=>c.id),w=dash.weeks,cur=agg(ids,WEEKS-w,WEEKS,true);
+ const lines=[`SERUMPUN TOWNSHIP REPORT`,`Scope: ${dash.township==="all"?"All townships":dash.township}`,`Period: last ${w} weeks (to ${fmtDate(new Date().toISOString().slice(0,10))})`,``,`Active members (avg/week): ${cur.active} of ${cs.reduce((n,c)=>n+comm(c.id).members,0)} joined`,`Posts and answers: ${cur.posts}`,`Trades completed: ${cur.trades} (about ${Math.round(cur.trades*1.8)} kg reused)`,`Events held: ${cur.events}, ${cur.att} attendees`,`New neighbour links: ${cur.conn}`,`Mentor pairs: ${cs.reduce((n,c)=>n+c.mentors,0)}`,``,`COMMUNITY HEALTH`];
+ cs.forEach(c=>{const s=commScore(c.id,w);lines.push(`- ${c.name}: ${HL[s.health][1]} (${s.score} activities/week)`);});
+ lines.push("",`Sample data from the Serumpun prototype.`);return lines.join("\n");
+}
+function renderModal(){
+ const m=dash.modal;const root=$("#modalRoot");if(!m){root.innerHTML="";return;}
+ let inner="";
+ if(m.type==="announce")inner=`<h2>Post announcement</h2><form id="annForm" class="stack" novalidate><div class="fld"><label for="anTo">Send to</label>${targetSelect("anTo")}</div><div class="fld"><label for="anTitle">Title</label><input id="anTitle" class="pill-in" value="Free seedlings at the Elmina Central Park nursery"></div><div class="fld"><label for="anMsg">Message</label><textarea id="anMsg" class="pill-in">Collect up to 5 free vegetable seedlings per household this Saturday, 9 AM to 12 PM. Bring your Serumpun app to show your community.</textarea></div><p class="err" id="anErr"></p><div class="mrow"><button type="button" class="btn outline sm" data-act="dclose">Cancel</button><button class="btn primary sm" type="submit">${ic("send")}Post to residents</button></div></form>`;
+ if(m.type==="sponsor"){const evs=state.events.filter(e=>!e.sponsor);inner=`<h2>Sponsor an event</h2>${evs.length?`<form id="spForm" class="stack" novalidate><div class="fld"><label for="spEv">Event</label><select id="spEv" class="pill-in">${evs.map(e=>`<option value="${e.id}" ${m.ev===e.id?"selected":""}>${esc(e.title)} · ${esc(cbase(e.comm).name)} · ${fmtDate(e.date,true)} (${e.going}/${e.cap})</option>`).join("")}</select></div><fieldset class="fld" style="border:0;padding:0;margin:0"><legend class="lab" style="margin-bottom:6px">Support</legend><div class="radios">${["Seedlings and tools","Refreshments","RM 300 budget","Gardening expert"].map((s,i)=>`<label><input type="radio" name="spWhat" value="${s}" ${i===0?"checked":""}>${s}</label>`).join("")}</div></fieldset><div class="mrow"><button type="button" class="btn outline sm" data-act="dclose">Cancel</button><button class="btn primary sm" type="submit">${ic("gift")}Confirm sponsorship</button></div></form>`:`<p class="note">Every upcoming event already has a sponsor.</p><div class="mrow"><button class="btn outline sm" data-act="dclose">Close</button></div>`}`;}
+ if(m.type==="space")inner=`<h2>Offer greenhouse space</h2><form id="spcForm" class="stack" novalidate><div class="fld"><label for="scTo">Community</label><select id="scTo" class="pill-in">${COMMS.map(c=>{const h=commScore(c.id,dash.weeks).health;return`<option value="${c.id}" ${h==="bad"?"selected":""}>${esc(c.name)} (${HL[h][1]})</option>`;}).join("")}</select></div><div class="fld"><label for="scWhat">What you are offering</label><textarea id="scWhat" class="pill-in">A 20 m² plot with water access next to the township clubhouse, free for 6 months.</textarea></div><div class="mrow"><button type="button" class="btn outline sm" data-act="dclose">Cancel</button><button class="btn primary sm" type="submit">${ic("gh")}Send offer</button></div></form>`;
+ if(m.type==="export")inner=`<h2>Export report</h2><p class="note">Copy this summary into an email or your monthly report.</p><label class="sr" for="repTx">Report text</label><textarea id="repTx" class="pill-in report" readonly>${esc(reportText())}</textarea><div class="mrow"><button class="btn outline sm" data-act="dclose">Close</button><button class="btn primary sm" data-act="copyRep">${ic("copy")}Copy report</button></div>`;
+ if(m.type==="comm"){const c=comm(m.id);const w=dash.weeks;const a=agg([c.id],WEEKS-w,WEEKS,true);const s=commScore(c.id,w);const vals=[];const labels=[];for(let i=WEEKS-w;i<WEEKS;i++){const x=SERIES[c.id][i];vals.push(x.posts+x.trades);labels.push(weekLabel(i));}
+  inner=`<h2>${esc(c.name)}</h2><p class="note">${esc(c.area)} · ${esc(c.township)} · organiser ${esc(c.organiser)}</p><span class="health ${HL[s.health][0]}" style="align-self:flex-start">${HL[s.health][1]}</span><div class="big2"><div><small>Members</small><b>${c.members}</b></div><div><small>Active per week</small><b>${a.active}</b></div><div><small>Posts and answers</small><b>${a.posts}</b></div><div><small>Trades</small><b>${a.trades}</b></div></div>${lineChart(labels,[{name:"Posts and trades",color:"#185C50",vals}])}<div class="mrow"><button class="btn outline sm" data-act="dclose">Close</button><button class="btn lime sm" data-act="dmodal" data-id="space" data-c="${c.id}">${ic("gh")}Offer space</button><button class="btn primary sm" data-act="dmodal" data-id="announce" data-c="${c.id}">${ic("mega")}Message residents</button></div>`;}
+ root.innerHTML=`<div class="modal-scrim" data-act="dscrim"><div class="modal" role="dialog" aria-modal="true" aria-label="${m.type}">${inner}</div></div>`;
+ if(m.c){const s=$("#anTo")||$("#scTo");if(s)s.value=m.c;}
+ const f=root.querySelector("input,select,textarea,button");f&&f.focus();
+}
+let dt;function dtoast(msg){const t=$("#dtoast");t.textContent=msg;t.classList.add("show");clearTimeout(dt);dt=setTimeout(()=>t.classList.remove("show"),2800);}
+function dashClick(el,e){
+ const a=el.dataset.act,id=el.dataset.id;
+ if(a==="dscrim"){if(e.target===el){dash.modal=null;renderModal();}return;}
+ if(a==="dtab"){dash.tab=id;renderDash();return;}
+ if(a==="dmodal"){dash.modal={type:id,ev:el.dataset.ev,c:el.dataset.c};renderModal();return;}
+ if(a==="commInfo"){dash.modal={type:"comm",id};renderModal();return;}
+ if(a==="dclose"){dash.modal=null;renderModal();return;}
+ if(a==="copyRep"){const tx=$("#repTx");const done=()=>dtoast("Report copied");try{navigator.clipboard.writeText(tx.value).then(done,()=>{tx.select();dtoast("Press Ctrl+C or Cmd+C to copy");});}catch(err){tx.select();dtoast("Press Ctrl+C or Cmd+C to copy");}return;}
+}
+document.addEventListener("change",e=>{
+ if(e.target.id==="fTown"){dash.township=e.target.value;renderDash();}
+ if(e.target.id==="fWeeks"){dash.weeks=+e.target.value;renderDash();}
+});
+document.addEventListener("submit",e=>{
+ const f=e.target;
+ if(f.id==="annForm"){e.preventDefault();const to=targetsFrom($("#anTo").value),ti=$("#anTitle").value.trim(),msg=$("#anMsg").value.trim();if(!ti||!msg){$("#anErr").textContent="Add a title and a message.";return;}
+  const a={id:uid("a"),title:ti,msg,targets:to,t:Date.now()};state.announcements.unshift(a);
+  const pid=uid("p");state.posts.unshift({id:pid,author:"Sime Darby Property",official:true,pinned:true,targets:to,comm:to[0],t:Date.now(),type:"",title:ti,body:msg,media:null,likes:0,liked:false,comments:[]});
+  if(to.some(i=>state.joined[i]))notify({icon:"mega",title:"Sime Darby Property",body:ti,link:["post",pid]});
+  dash.modal=null;renderModal();renderDash();save();dtoast(`Announcement sent to ${targetLabel(to)}`);}
+ if(f.id==="spForm"){e.preventDefault();const ev=state.events.find(x=>x.id===$("#spEv").value);const what=(f.querySelector("input[name=spWhat]:checked")||{}).value;ev.sponsor=what;if(state.joined[ev.comm]||ev.joined)notify({icon:"gift",title:"Event sponsored by SDP",body:`${ev.title}: ${what}`,link:["event",ev.id]});dash.modal=null;renderModal();renderDash();save();dtoast(`Sponsorship confirmed for ${ev.title}`);}
+ if(f.id==="spcForm"){e.preventDefault();const c=$("#scTo").value,what=$("#scWhat").value.trim();if(!what)return;const pid=uid("p");state.posts.unshift({id:pid,author:"Sime Darby Property",official:true,pinned:true,targets:[c],comm:c,t:Date.now(),type:"",title:"Greenhouse space offer",body:what,media:null,likes:0,liked:false,comments:[]});state.offers.unshift({c,what,t:Date.now()});if(state.joined[c])notify({icon:"gh",title:"Space offered to "+cbase(c).name,body:what.slice(0,70),link:["post",pid]});dash.modal=null;renderModal();renderDash();save();dtoast(`Offer sent to ${cbase(c).name}`);}
+});
+
+/* ---------- view switching ---------- */
+function setView(v){
+ ui.view=v;const isD=v==="dashboard";
+ $("#appView").hidden=isD;$("#dashView").hidden=!isD;
+ $("#vApp").setAttribute("aria-pressed",String(!isD));$("#vDash").setAttribute("aria-pressed",String(isD));
+ try{history.replaceState(null,"",isD?"#dashboard":"#app");}catch(e){}
+ if(isD)renderDash();else renderApp(false);
+ window.scrollTo(0,0);
+}
+function resetDemo(){state=seed();try{localStorage.removeItem(KEY);}catch(e){}Object.assign(ui,{screen:"login",params:{},stack:[],sheet:null,feed:"all",tradeTab:"offers",evTab:"upcoming",q:"",expanded:{},playing:null,editing:null,draft:{},onboard:false});dash.modal=null;renderModal();if(ui.view==="dashboard")renderDash();renderApp(true);(ui.view==="dashboard"?dtoast:toast)("Demo reset");}
+$("#resetBtn").addEventListener("click",resetDemo);
+
+renderApp(true);
+setView(location.hash==="#dashboard"?"dashboard":"app");
+})();
+</script>
+<script>
+if("serviceWorker" in navigator && (location.protocol==="https:"||location.hostname==="localhost")){
+  window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){});});
+}
+</script>
+</body>
+</html>
