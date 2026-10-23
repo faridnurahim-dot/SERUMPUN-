@@ -9,7 +9,7 @@ Serumpun is a greenhouse community app for residents of Sime Darby Property town
 
 Built for the **Sime Darby Property University Hackathon 2026**, theme **People: Neighbourhood Connection**.
 
-**Live demo:** `https://YOUR-USERNAME.github.io/serumpun/` *(replace after enabling GitHub Pages)*
+**Live demo:** `https://faridnurahim-dot.github.io/SERUMPUN-/` *(replace after enabling GitHub Pages)*
 
 ---
 
@@ -79,10 +79,12 @@ Actions taken in the resident app are counted live on the dashboard.
 
 | Name | Role |
 |---|---|
-| [Name] | [Role] |
-| [Name] | [Role] |
-| [Name] | [Role] |
+| [MUHAMMAD ARFAN BIN SHAMSUL] | [SOFTWARE TESTER] |
+| [MUHAMMAD FARID AZIZI BIN NURAHIM] | [SOFTWARE DEV] |
+| [MUHAMMAD ARIF FAHIM BIN MUHAMMAD SHARUL AZLEE] | [SYSTEM ANALYST] |
+| [MUHAMAD ALIM BIN MOHAMAD KHAIRANI] | [SOFTWARE DESIGNER] |
+| [MUHAMMAD ARIF BIN MOHD SAYUTI] | [UI/UX DESIGNER] |
 
-[University] · Sime Darby Property University Hackathon 2026
+Universiti Kebangsaan Malaysia · APHELIOS · Sime Darby Property University Hackathon 2026
 
 > All names and figures in the prototype are sample data.
